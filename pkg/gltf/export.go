@@ -90,6 +90,16 @@ func alphaModeFor(s *eqoa.Surface, blendGradients bool) string {
 }
 
 func ExportAssetToBuilder(b *Builder, r io.ReadSeeker, asset *eqoa.Asset, order binary.ByteOrder, registry *eqoa.SurfaceRegistry, blendGradients bool) (int, error) {
+	return ExportAssetToBuilderWithAppearance(b, r, asset, order, registry, blendGradients, nil)
+}
+
+// ExportAssetToBuilderWithAppearance is ExportAssetToBuilder with an optional
+// CHARCUST appearance to bake onto the character's materials. When appearance is
+// nil the output is identical to ExportAssetToBuilder (byte-for-byte); when set,
+// each character body material gets a provisional body-slot guess in its extras
+// and — per the chosen armor set / hair / tint — its BaseColor texture/factor is
+// overridden. See AppearanceSpec for the (heuristic) slot model.
+func ExportAssetToBuilderWithAppearance(b *Builder, r io.ReadSeeker, asset *eqoa.Asset, order binary.ByteOrder, registry *eqoa.SurfaceRegistry, blendGradients bool, appearance *AppearanceSpec) (int, error) {
 	rootNodeIdx := b.AddNode(Node{Name: fmt.Sprintf("Sprite_0x%X", asset.ID)})
 
 	// Add Skeleton
@@ -250,6 +260,25 @@ func ExportAssetToBuilder(b *Builder, r io.ReadSeeker, asset *eqoa.Asset, order 
 			surfaceAlphaMode[dictID] = alphaModeFor(surf, blendGradients)
 		}
 
+		// Opt-in CHARCUST appearance: pre-embed the chosen armor-slot and hair
+		// textures once so material overrides below can reference stable indices.
+		// Only runs when a spec is supplied (default export path is untouched).
+		var armorTexIdx [5]int
+		hairTexIdx := -1
+		for i := range armorTexIdx {
+			armorTexIdx[i] = -1
+		}
+		if appearance != nil {
+			for slot := 0; slot < 5; slot++ {
+				if img := appearance.ArmorTextures[slot]; img != nil {
+					armorTexIdx[slot] = b.AddImageTexture(img)
+				}
+			}
+			if appearance.HairTexture != nil {
+				hairTexIdx = b.AddImageTexture(appearance.HairTexture)
+			}
+		}
+
 		if materialArray != nil {
 			for i, mObj := range materialArray.Children {
 				body, _ := mObj.ReadBody(r)
@@ -302,6 +331,42 @@ func ExportAssetToBuilder(b *Builder, r io.ReadSeeker, asset *eqoa.Asset, order 
 							gm.PBRMetallicRoughness.BaseColorFactor = []float32{0.65, 0.65, 0.65, 1.0}
 						}
 					}
+					// CHARCUST appearance override (opt-in). Provisional slot model
+					// (see AppearanceSpec): material palette index i → body slot
+					// i mod 5; the head/hair slot is heuristically material 0.
+					// Apply the chosen armor-set texture per slot, hair to the head
+					// material, and the skin tint as BaseColorFactor on bare-skin
+					// materials (armorSet 0, or any material we couldn't skin). This
+					// is best-effort and meant to be visually spot-checked.
+					if appearance != nil {
+						slot := i % 5
+						hairSlot := i == 0 && hairTexIdx >= 0
+						bare := false
+						if hairSlot {
+							gm.PBRMetallicRoughness.BaseColorTexture = &TextureInfo{Index: hairTexIdx}
+							gm.AlphaMode = "MASK"
+							cutoff := float32(0.5)
+							gm.AlphaCutoff = &cutoff
+						} else if appearance.ArmorSet != 0 && armorTexIdx[slot] >= 0 {
+							gm.PBRMetallicRoughness.BaseColorTexture = &TextureInfo{Index: armorTexIdx[slot]}
+						} else {
+							// Bare-skin slot: tint the base color (skin/robe color).
+							bare = true
+							gm.PBRMetallicRoughness.BaseColorFactor = []float32{
+								float32(appearance.Tint[0]) / 255.0,
+								float32(appearance.Tint[1]) / 255.0,
+								float32(appearance.Tint[2]) / 255.0,
+								float32(appearance.Tint[3]) / 255.0,
+							}
+						}
+						gm.Extras = mustJSON(matExtras{
+							MatIndex:  i,
+							SlotGuess: slot,
+							HairSlot:  hairSlot,
+							Bare:      bare,
+						})
+					}
+
 					matIdx := len(b.Doc.Materials)
 					b.Doc.Materials = append(b.Doc.Materials, gm)
 					materialToIndex[i] = matIdx

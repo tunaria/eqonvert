@@ -154,6 +154,11 @@ type Material struct {
 	AlphaMode            string       `json:"alphaMode,omitempty"`
 	AlphaCutoff          *float32     `json:"alphaCutoff,omitempty"`
 	DoubleSided          bool         `json:"doubleSided,omitempty"`
+	// Extras is the glTF-sanctioned carrier for application-specific data
+	// (ignored by viewers). Used to tag each character material with its palette
+	// index and a provisional CHARCUST body-slot guess so a downstream viewer can
+	// apply appearance (armor/hair/tint) at runtime. See gltf.AppearanceOptions.
+	Extras json.RawMessage `json:"extras,omitempty"`
 }
 
 type PBR struct {
