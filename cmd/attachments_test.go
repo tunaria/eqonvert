@@ -132,10 +132,88 @@ func TestWriteAttachmentSidecar(t *testing.T) {
 	}
 }
 
-// An asset with no attachments must not leave an empty sidecar behind.
+// A CSprite carries 0x2920 attach slots and no 0x2500 records; the sidecar must
+// still be written, keyed by slot and resolved through the same joints table.
+func TestWriteAttachmentSidecarAttachSlots(t *testing.T) {
+	asset := attachTestAsset()
+	asset.Attachments = nil
+	asset.AttachSlots = []eqoa.CSpriteAttachSlot{
+		{Slot: 0, NodeIndex: 1},
+		{Slot: 1, NodeIndex: 3},
+		{Slot: 2, NodeIndex: eqoa.CSpriteAttachSlotNoNode},
+	}
+
+	b := gltf.NewBuilder()
+	rootIdx, err := gltf.ExportAssetToBuilder(b, bytes.NewReader(nil), asset, binary.LittleEndian, nil, true)
+	if err != nil {
+		t.Fatalf("ExportAssetToBuilder: %v", err)
+	}
+	b.AddSceneNode(rootIdx)
+
+	glbPath := filepath.Join(t.TempDir(), "CHAR_0xABCD1234.glb")
+	if err := writeAttachmentSidecar(asset, b, glbPath); err != nil {
+		t.Fatalf("writeAttachmentSidecar: %v", err)
+	}
+
+	data, err := os.ReadFile(filepath.Join(filepath.Dir(glbPath), "CHAR_0xABCD1234"+attachSidecarSuffix))
+	if err != nil {
+		t.Fatalf("sidecar not written: %v", err)
+	}
+
+	var got struct {
+		Joints []struct {
+			GLTFNode *int `json:"gltf_node"`
+		} `json:"joints"`
+		Attachments []any `json:"attachments"`
+		AttachSlots []struct {
+			Slot      int32  `json:"slot"`
+			NodeIndex int32  `json:"node_index"`
+			NodeName  string `json:"node_name"`
+			GLTFNode  *int   `json:"gltf_node"`
+		} `json:"attach_slots"`
+	}
+	if err := json.Unmarshal(data, &got); err != nil {
+		t.Fatalf("sidecar is not valid JSON: %v", err)
+	}
+
+	// A CSprite has no 0x2500 records, so the key must be absent rather than an
+	// empty array claiming there are none to find.
+	if got.Attachments != nil {
+		t.Errorf("attachments = %v, want the key omitted", got.Attachments)
+	}
+	if len(got.AttachSlots) != 3 {
+		t.Fatalf("attach_slots = %d, want 3", len(got.AttachSlots))
+	}
+
+	for i, want := range []struct {
+		slot, node int32
+		name       string
+	}{{0, 1, "Joint_1"}, {1, 3, "Joint_3"}} {
+		s := got.AttachSlots[i]
+		if s.Slot != want.slot || s.NodeIndex != want.node || s.NodeName != want.name {
+			t.Errorf("attach_slots[%d] = %+v, want slot %d node %d %q", i, s, want.slot, want.node, want.name)
+		}
+		if s.GLTFNode == nil || *s.GLTFNode != *got.Joints[want.node].GLTFNode {
+			t.Errorf("attach_slots[%d].gltf_node = %v, want joint %d's node %v",
+				i, s.GLTFNode, want.node, got.Joints[want.node].GLTFNode)
+		}
+		if name := b.Doc.Nodes[*s.GLTFNode].Name; name != s.NodeName {
+			t.Errorf("attach_slots[%d] points at node %d named %q, sidecar says %q", i, *s.GLTFNode, name, s.NodeName)
+		}
+	}
+
+	// A slot with no attach point must not be given one.
+	if empty := got.AttachSlots[2]; empty.NodeIndex != -1 || empty.NodeName != "" || empty.GLTFNode != nil {
+		t.Errorf("attach_slots[2] = %+v, want an unresolved -1 slot", empty)
+	}
+}
+
+// An asset with neither attachments nor attach slots must not leave an empty
+// sidecar behind.
 func TestWriteAttachmentSidecarSkipsWhenEmpty(t *testing.T) {
 	asset := attachTestAsset()
 	asset.Attachments = nil
+	asset.AttachSlots = nil
 
 	b := gltf.NewBuilder()
 	if _, err := gltf.ExportAssetToBuilder(b, bytes.NewReader(nil), asset, binary.LittleEndian, nil, true); err != nil {
