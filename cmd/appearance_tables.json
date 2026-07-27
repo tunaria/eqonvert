@@ -1,0 +1,763 @@
+{
+ "tints": [
+  [
+   255,
+   255,
+   255,
+   255
+  ],
+  [
+   90,
+   90,
+   90,
+   255
+  ],
+  [
+   0,
+   180,
+   255,
+   255
+  ],
+  [
+   150,
+   100,
+   50,
+   255
+  ],
+  [
+   0,
+   0,
+   140,
+   255
+  ],
+  [
+   0,
+   200,
+   50,
+   255
+  ],
+  [
+   250,
+   175,
+   50,
+   255
+  ],
+  [
+   100,
+   100,
+   0,
+   255
+  ],
+  [
+   240,
+   60,
+   60,
+   255
+  ],
+  [
+   165,
+   245,
+   255,
+   255
+  ],
+  [
+   160,
+   170,
+   180,
+   255
+  ],
+  [
+   220,
+   190,
+   150,
+   255
+  ],
+  [
+   0,
+   200,
+   180,
+   255
+  ],
+  [
+   150,
+   0,
+   60,
+   255
+  ],
+  [
+   240,
+   240,
+   0,
+   255
+  ]
+ ],
+ "hair": {
+  "0": {
+   "dictID": "0x98F86489",
+   "file": "DATA/CHAR/CHAR_0x98F86489.png"
+  },
+  "1": {
+   "dictID": "0x221E7298",
+   "file": "DATA/CHAR/CHAR_0x221E7298.png"
+  },
+  "2": {
+   "dictID": "0x6DCEF2D0",
+   "file": "DATA/CHAR/CHAR_0x6DCEF2D0.png"
+  },
+  "3": {
+   "dictID": "0xFEBCE4D5",
+   "file": "DATA/CHAR/CHAR_0xFEBCE4D5.png"
+  },
+  "4": {
+   "dictID": "0xD499494B",
+   "file": "DATA/CHAR/CHAR_0xD499494B.png"
+  },
+  "5": {
+   "dictID": "0x8931CEE6",
+   "file": "DATA/CHAR/CHAR_0x8931CEE6.png"
+  },
+  "6": {
+   "dictID": "0x9F87C7AF",
+   "file": "DATA/CHAR/CHAR_0x9F87C7AF.png"
+  },
+  "7": {
+   "dictID": "0xDC79B7C3",
+   "file": "DATA/CHAR/CHAR_0xDC79B7C3.png"
+  }
+ },
+ "robe": {
+  "0": {
+   "dictID": "0x455F0D60",
+   "file": "DATA2/CHARCUST/CHARCUST_0x455F0D60.png"
+  },
+  "1": {
+   "dictID": "0x7DDA79FA",
+   "file": "DATA2/CHARCUST/CHARCUST_0x7DDA79FA.png"
+  },
+  "2": {
+   "dictID": "0xA89BE30B",
+   "file": "DATA2/CHARCUST/CHARCUST_0xA89BE30B.png"
+  },
+  "3": {
+   "dictID": "0x0D4477B3",
+   "file": "DATA2/CHARCUST/CHARCUST_0xD4477B3.png"
+  },
+  "4": {
+   "dictID": "0x5D2F97E1",
+   "file": "DATA2/CHARCUST/CHARCUST_0x5D2F97E1.png"
+  },
+  "5": {
+   "dictID": "0x455D0BA5",
+   "file": "DATA2/CHARCUST/CHARCUST_0x455D0BA5.png"
+  },
+  "6": {
+   "dictID": "0x2720732E",
+   "file": "DATA2/CHARCUST/CHARCUST_0x2720732E.png"
+  },
+  "7": {
+   "dictID": "0xB64B5794",
+   "file": "DATA2/CHARCUST/CHARCUST_0xB64B5794.png"
+  }
+ },
+ "faces": {
+  "Human": {
+   "0": {
+    "0": {
+     "dictID": "0x4A7AB44E",
+     "file": "DATA/CHAR/CHAR_0x4A7AB44E.png"
+    },
+    "1": {
+     "dictID": "0x765CFD7D",
+     "file": "DATA/CHAR/CHAR_0x765CFD7D.png"
+    }
+   },
+   "1": {
+    "0": {
+     "dictID": "0x5C086A9F",
+     "file": "DATA2/CHARFACE/CHARFACE_0x5C086A9F.png"
+    },
+    "1": {
+     "dictID": "0x87EAB3CE",
+     "file": "DATA2/CHARFACE/CHARFACE_0x87EAB3CE.png"
+    }
+   },
+   "2": {
+    "0": {
+     "dictID": "0x6D9620F0",
+     "file": "DATA2/CHARFACE/CHARFACE_0x6D9620F0.png"
+    },
+    "1": {
+     "dictID": "0x99786A1F",
+     "file": "DATA2/CHARFACE/CHARFACE_0x99786A1F.png"
+    }
+   },
+   "3": {
+    "0": {
+     "dictID": "0x7F23D741",
+     "file": "DATA2/CHARFACE/CHARFACE_0x7F23D741.png"
+    },
+    "1": {
+     "dictID": "0xAB062070",
+     "file": "DATA2/CHARFACE/CHARFACE_0xAB062070.png"
+    }
+   }
+  },
+  "Elf": {
+   "0": {
+    "0": {
+     "dictID": "0x74732F1C",
+     "file": "DATA/CHAR/CHAR_0x74732F1C.png"
+    },
+    "1": {
+     "dictID": "0xF83D38BB",
+     "file": "DATA2/CHARFACE/CHARFACE_0xF83D38BB.png"
+    }
+   },
+   "1": {
+    "0": {
+     "dictID": "0x8600E56D",
+     "file": "DATA2/CHARFACE/CHARFACE_0x8600E56D.png"
+    },
+    "1": {
+     "dictID": "0x09CAEF0C",
+     "file": "DATA2/CHARFACE/CHARFACE_0x9CAEF0C.png"
+    }
+   },
+   "2": {
+    "0": {
+     "dictID": "0x978E9BBE",
+     "file": "DATA2/CHARFACE/CHARFACE_0x978E9BBE.png"
+    },
+    "1": {
+     "dictID": "0x1B58A55D",
+     "file": "DATA2/CHARFACE/CHARFACE_0x1B58A55D.png"
+    }
+   },
+   "3": {
+    "0": {
+     "dictID": "0xA91C520F",
+     "file": "DATA2/CHARFACE/CHARFACE_0xA91C520F.png"
+    },
+    "1": {
+     "dictID": "0x2CE65BAE",
+     "file": "DATA2/CHARFACE/CHARFACE_0x2CE65BAE.png"
+    }
+   }
+  },
+  "DarkElf": {
+   "0": {
+    "0": {
+     "dictID": "0x42FB8FD2",
+     "file": "DATA2/CHARFACE/CHARFACE_0x42FB8FD2.png"
+    },
+    "1": {
+     "dictID": "0xEC584121",
+     "file": "DATA2/CHARFACE/CHARFACE_0xEC584121.png"
+    }
+   },
+   "1": {
+    "0": {
+     "dictID": "0x54894623",
+     "file": "DATA2/CHARFACE/CHARFACE_0x54894623.png"
+    },
+    "1": {
+     "dictID": "0xFDE5F772",
+     "file": "DATA2/CHARFACE/CHARFACE_0xFDE5F772.png"
+    }
+   },
+   "2": {
+    "0": {
+     "dictID": "0x6616FC74",
+     "file": "DATA2/CHARFACE/CHARFACE_0x6616FC74.png"
+    },
+    "1": {
+     "dictID": "0x0F73ADC3",
+     "file": "DATA2/CHARFACE/CHARFACE_0xF73ADC3.png"
+    }
+   },
+   "3": {
+    "0": {
+     "dictID": "0x77A4B2C5",
+     "file": "DATA2/CHARFACE/CHARFACE_0x77A4B2C5.png"
+    },
+    "1": {
+     "dictID": "0x21016414",
+     "file": "DATA2/CHARFACE/CHARFACE_0x21016414.png"
+    }
+   }
+  },
+  "Gnome": {
+   "0": {
+    "0": {
+     "dictID": "0x99B0BB43",
+     "file": "DATA2/CHARFACE/CHARFACE_0x99B0BB43.png"
+    },
+    "1": {
+     "dictID": "0x63155B1A",
+     "file": "DATA2/CHARFACE/CHARFACE_0x63155B1A.png"
+    }
+   },
+   "1": {
+    "0": {
+     "dictID": "0xAB3E7194",
+     "file": "DATA2/CHARFACE/CHARFACE_0xAB3E7194.png"
+    },
+    "1": {
+     "dictID": "0x74A3116B",
+     "file": "DATA2/CHARFACE/CHARFACE_0x74A3116B.png"
+    }
+   },
+   "2": {
+    "0": {
+     "dictID": "0xBCCC27E5",
+     "file": "DATA2/CHARFACE/CHARFACE_0xBCCC27E5.png"
+    },
+    "1": {
+     "dictID": "0x8630C7BC",
+     "file": "DATA2/CHARFACE/CHARFACE_0x8630C7BC.png"
+    }
+   },
+   "3": {
+    "0": {
+     "dictID": "0xCE59DE36",
+     "file": "DATA2/CHARFACE/CHARFACE_0xCE59DE36.png"
+    },
+    "1": {
+     "dictID": "0x97BE7E0D",
+     "file": "DATA2/CHARFACE/CHARFACE_0x97BE7E0D.png"
+    }
+   }
+  },
+  "Dwarf": {
+   "0": {
+    "0": {
+     "dictID": "0x6F7E7049",
+     "file": "DATA2/CHARFACE/CHARFACE_0x6F7E7049.png"
+    },
+    "1": {
+     "dictID": "0xBDB14A50",
+     "file": "DATA2/CHARFACE/CHARFACE_0xBDB14A50.png"
+    }
+   },
+   "1": {
+    "0": {
+     "dictID": "0x810C269A",
+     "file": "DATA2/CHARFACE/CHARFACE_0x810C269A.png"
+    },
+    "1": {
+     "dictID": "0xCF3F00A1",
+     "file": "DATA2/CHARFACE/CHARFACE_0xCF3F00A1.png"
+    }
+   },
+   "2": {
+    "0": {
+     "dictID": "0x9299DCEB",
+     "file": "DATA2/CHARFACE/CHARFACE_0x9299DCEB.png"
+    },
+    "1": {
+     "dictID": "0xE0CCB6F2",
+     "file": "DATA2/CHARFACE/CHARFACE_0xE0CCB6F2.png"
+    }
+   },
+   "3": {
+    "0": {
+     "dictID": "0xA427933C",
+     "file": "DATA2/CHARFACE/CHARFACE_0xA427933C.png"
+    },
+    "1": {
+     "dictID": "0xF25A6D43",
+     "file": "DATA2/CHARFACE/CHARFACE_0xF25A6D43.png"
+    }
+   }
+  },
+  "Troll": {
+   "0": {
+    "0": {
+     "dictID": "0x12A88832",
+     "file": "DATA2/CHARFACE/CHARFACE_0x12A88832.png"
+    },
+    "1": {
+     "dictID": "0x7E6E1C81",
+     "file": "DATA2/CHARFACE/CHARFACE_0x7E6E1C81.png"
+    }
+   },
+   "1": {
+    "0": {
+     "dictID": "0x24363E83",
+     "file": "DATA2/CHARFACE/CHARFACE_0x24363E83.png"
+    },
+    "1": {
+     "dictID": "0x8FFBD2D2",
+     "file": "DATA2/CHARFACE/CHARFACE_0x8FFBD2D2.png"
+    }
+   },
+   "2": {
+    "0": {
+     "dictID": "0x35C3F4D4",
+     "file": "DATA2/CHARFACE/CHARFACE_0x35C3F4D4.png"
+    },
+    "1": {
+     "dictID": "0xA1898923",
+     "file": "DATA2/CHARFACE/CHARFACE_0xA1898923.png"
+    }
+   },
+   "3": {
+    "0": {
+     "dictID": "0x4751AB25",
+     "file": "DATA2/CHARFACE/CHARFACE_0x4751AB25.png"
+    },
+    "1": {
+     "dictID": "0xB3173F74",
+     "file": "DATA2/CHARFACE/CHARFACE_0xB3173F74.png"
+    }
+   }
+  },
+  "Barbarian": {
+   "0": {
+    "0": {
+     "dictID": "0xD9EC0301",
+     "file": "DATA2/CHARFACE/CHARFACE_0xD9EC0301.png"
+    },
+    "1": {
+     "dictID": "0x28F19AC8",
+     "file": "DATA/CHAR/CHAR_0x28F19AC8.png"
+    }
+   },
+   "1": {
+    "0": {
+     "dictID": "0xEB79B952",
+     "file": "DATA/CHAR/CHAR_0xEB79B952.png"
+    },
+    "1": {
+     "dictID": "0x3A7F5119",
+     "file": "DATA2/CHARFACE/CHARFACE_0x3A7F5119.png"
+    }
+   },
+   "2": {
+    "0": {
+     "dictID": "0xFD076FA3",
+     "file": "DATA2/CHARFACE/CHARFACE_0xFD076FA3.png"
+    },
+    "1": {
+     "dictID": "0x4C0D076A",
+     "file": "DATA2/CHARFACE/CHARFACE_0x4C0D076A.png"
+    }
+   },
+   "3": {
+    "0": {
+     "dictID": "0x0E9525F4",
+     "file": "DATA2/CHARFACE/CHARFACE_0xE9525F4.png"
+    },
+    "1": {
+     "dictID": "0x5D9ABDBB",
+     "file": "DATA2/CHARFACE/CHARFACE_0x5D9ABDBB.png"
+    }
+   }
+  },
+  "Halfling": {
+   "0": {
+    "0": {
+     "dictID": "0x6D7EAC68",
+     "file": "DATA2/CHARFACE/CHARFACE_0x6D7EAC68.png"
+    },
+    "1": {
+     "dictID": "0xBB6F8467",
+     "file": "DATA2/CHARFACE/CHARFACE_0xBB6F8467.png"
+    }
+   },
+   "1": {
+    "0": {
+     "dictID": "0x7F0C62B9",
+     "file": "DATA2/CHARFACE/CHARFACE_0x7F0C62B9.png"
+    },
+    "1": {
+     "dictID": "0xCCFD3AB8",
+     "file": "DATA2/CHARFACE/CHARFACE_0xCCFD3AB8.png"
+    }
+   },
+   "2": {
+    "0": {
+     "dictID": "0x909A190A",
+     "file": "DATA2/CHARFACE/CHARFACE_0x909A190A.png"
+    },
+    "1": {
+     "dictID": "0xDE8AF109",
+     "file": "DATA2/CHARFACE/CHARFACE_0xDE8AF109.png"
+    }
+   },
+   "3": {
+    "0": {
+     "dictID": "0xA227CF5B",
+     "file": "DATA2/CHARFACE/CHARFACE_0xA227CF5B.png"
+    },
+    "1": {
+     "dictID": "0xF018A75A",
+     "file": "DATA2/CHARFACE/CHARFACE_0xF018A75A.png"
+    }
+   }
+  },
+  "Erudite": {
+   "0": {
+    "0": {
+     "dictID": "0xD4259B41",
+     "file": "DATA2/CHARFACE/CHARFACE_0xD4259B41.png"
+    },
+    "1": {
+     "dictID": "0x07D0B508",
+     "file": "DATA2/CHARFACE/CHARFACE_0x7D0B508.png"
+    }
+   },
+   "1": {
+    "0": {
+     "dictID": "0xE5B35192",
+     "file": "DATA2/CHARFACE/CHARFACE_0xE5B35192.png"
+    },
+    "1": {
+     "dictID": "0x195E6B59",
+     "file": "DATA2/CHARFACE/CHARFACE_0x195E6B59.png"
+    }
+   },
+   "2": {
+    "0": {
+     "dictID": "0xF74107E3",
+     "file": "DATA2/CHARFACE/CHARFACE_0xF74107E3.png"
+    },
+    "1": {
+     "dictID": "0x2AEC21AA",
+     "file": "DATA2/CHARFACE/CHARFACE_0x2AEC21AA.png"
+    }
+   },
+   "3": {
+    "0": {
+     "dictID": "0x08CEBE34",
+     "file": "DATA2/CHARFACE/CHARFACE_0x8CEBE34.png"
+    },
+    "1": {
+     "dictID": "0x3C79D7FB",
+     "file": "DATA2/CHARFACE/CHARFACE_0x3C79D7FB.png"
+    }
+   }
+  },
+  "race10": {
+   "0": {
+    "0": {
+     "dictID": "0xFD04B372",
+     "file": "DATA2/CHARFACE/CHARFACE_0xFD04B372.png"
+    },
+    "1": {
+     "dictID": "0xDAFD61C1",
+     "file": "DATA2/CHARFACE/CHARFACE_0xDAFD61C1.png"
+    }
+   },
+   "1": {
+    "0": {
+     "dictID": "0x0E9269C3",
+     "file": "DATA2/CHARFACE/CHARFACE_0xE9269C3.png"
+    },
+    "1": {
+     "dictID": "0xEC8B1812",
+     "file": "DATA2/CHARFACE/CHARFACE_0xEC8B1812.png"
+    }
+   },
+   "2": {
+    "0": {
+     "dictID": "0x20202014",
+     "file": "DATA2/CHARFACE/CHARFACE_0x20202014.png"
+    },
+    "1": {
+     "dictID": "0xFE18CE63",
+     "file": "DATA2/CHARFACE/CHARFACE_0xFE18CE63.png"
+    }
+   },
+   "3": {
+    "0": {
+     "dictID": "0x31ADD665",
+     "file": "DATA2/CHARFACE/CHARFACE_0x31ADD665.png"
+    },
+    "1": {
+     "dictID": "0x0FA684B4",
+     "file": "DATA2/CHARFACE/CHARFACE_0xFA684B4.png"
+    }
+   }
+  }
+ },
+ "armorSets": {
+  "1": {
+   "0": {
+    "dictID": "0xBF4B7E0A",
+    "file": "DATA2/CHARCUST/CHARCUST_0xBF4B7E0A.png"
+   },
+   "1": {
+    "dictID": "0x62444D1A",
+    "file": "DATA2/CHARCUST/CHARCUST_0x62444D1A.png"
+   },
+   "2": {
+    "dictID": "0x84D2F275",
+    "file": "DATA2/CHARCUST/CHARCUST_0x84D2F275.png"
+   },
+   "3": {
+    "dictID": "0x2CB53288",
+    "file": "DATA2/CHARCUST/CHARCUST_0x2CB53288.png"
+   },
+   "4": {
+    "dictID": "0x7AD7D1B1",
+    "file": "DATA2/CHARCUST/CHARCUST_0x7AD7D1B1.png"
+   }
+  },
+  "2": {
+   "0": {
+    "dictID": "0x72D073EB",
+    "file": "DATA2/CHARCUST/CHARCUST_0x72D073EB.png"
+   },
+   "1": {
+    "dictID": "0xB99BD955",
+    "file": "DATA2/CHARCUST/CHARCUST_0xB99BD955.png"
+   },
+   "2": {
+    "dictID": "0x3857E856",
+    "file": "DATA2/CHARCUST/CHARCUST_0x3857E856.png"
+   },
+   "3": {
+    "dictID": "0xA73D0D53",
+    "file": "DATA2/CHARCUST/CHARCUST_0xA73D0D53.png"
+   },
+   "4": {
+    "dictID": "0xF55FAC7C",
+    "file": "DATA/CHAR/CHAR_0xF55FAC7C.png"
+   }
+  },
+  "3": {
+   "0": {
+    "dictID": "0x581046F4",
+    "file": "DATA2/CHARCUST/CHARCUST_0x581046F4.png"
+   },
+   "1": {
+    "dictID": "0xC0EC54C8",
+    "file": "DATA2/CHARCUST/CHARCUST_0xC0EC54C8.png"
+   },
+   "2": {
+    "dictID": "0x1D97BB5F",
+    "file": "DATA2/CHARCUST/CHARCUST_0x1D97BB5F.png"
+   },
+   "3": {
+    "dictID": "0x06CA3DD6",
+    "file": "DATA2/CHARCUST/CHARCUST_0x6CA3DD6.png"
+   },
+   "4": {
+    "dictID": "0x54ECDCFF",
+    "file": "DATA2/CHARCUST/CHARCUST_0x54ECDCFF.png"
+   }
+  },
+  "4": {
+   "0": {
+    "dictID": "0x40B0DDA7",
+    "file": "DATA/CHAR/CHAR_0x40B0DDA7.png"
+   },
+   "1": {
+    "dictID": "0xEB416A29",
+    "file": "DATA/CHAR/CHAR_0xEB416A29.png"
+   },
+   "2": {
+    "dictID": "0x06385212",
+    "file": "DATA/CHAR/CHAR_0x6385212.png"
+   },
+   "3": {
+    "dictID": "0xF50617E7",
+    "file": "DATA/CHAR/CHAR_0xF50617E7.png"
+   },
+   "4": {
+    "dictID": "0x4328B710",
+    "file": "DATA/CHAR/CHAR_0x4328B710.png"
+   }
+  },
+  "5": {
+   "0": {
+    "dictID": "0x39BCF85F",
+    "file": "DATA2/CHARCUST/CHARCUST_0x39BCF85F.png"
+   },
+   "1": {
+    "dictID": "0xE60EEF91",
+    "file": "DATA2/CHARCUST/CHARCUST_0xE60EEF91.png"
+   },
+   "2": {
+    "dictID": "0xFF446CCA",
+    "file": "DATA2/CHARCUST/CHARCUST_0xFF446CCA.png"
+   },
+   "3": {
+    "dictID": "0x75F2A4CF",
+    "file": "DATA2/CHARCUST/CHARCUST_0x75F2A4CF.png"
+   },
+   "4": {
+    "dictID": "0xC41543F8",
+    "file": "DATA2/CHARCUST/CHARCUST_0xC41543F8.png"
+   }
+  },
+  "6": {
+   "0": {
+    "dictID": "0xF94BD113",
+    "file": "DATA2/CHARCUST/CHARCUST_0xF94BD113.png"
+   },
+   "1": {
+    "dictID": "0xA0A2488D",
+    "file": "DATA2/CHARCUST/CHARCUST_0xA0A2488D.png"
+   },
+   "2": {
+    "dictID": "0xBED3457E",
+    "file": "DATA2/CHARCUST/CHARCUST_0xBED3457E.png"
+   },
+   "3": {
+    "dictID": "0x6F97E30B",
+    "file": "DATA2/CHARCUST/CHARCUST_0x6F97E30B.png"
+   },
+   "4": {
+    "dictID": "0xBDBA8234",
+    "file": "DATA2/CHARCUST/CHARCUST_0xBDBA8234.png"
+   }
+  },
+  "7": {
+   "0": {
+    "dictID": "0x2603BB5F",
+    "file": "DATA2/CHARCUST/CHARCUST_0x2603BB5F.png"
+   },
+   "1": {
+    "dictID": "0x238E0091",
+    "file": "DATA2/CHARCUST/CHARCUST_0x238E0091.png"
+   },
+   "2": {
+    "dictID": "0xEB8B2FCA",
+    "file": "DATA2/CHARCUST/CHARCUST_0xEB8B2FCA.png"
+   },
+   "3": {
+    "dictID": "0x8D3F65CF",
+    "file": "DATA2/CHARCUST/CHARCUST_0x8D3F65CF.png"
+   },
+   "4": {
+    "dictID": "0xDB6204F8",
+    "file": "DATA2/CHARCUST/CHARCUST_0xDB6204F8.png"
+   }
+  },
+  "8": {
+   "0": {
+    "dictID": "0x3FDB0DDB",
+    "file": "DATA2/CHARCUST/CHARCUST_0x3FDB0DDB.png"
+   },
+   "1": {
+    "dictID": "0x81343DA5",
+    "file": "DATA2/CHARCUST/CHARCUST_0x81343DA5.png"
+   },
+   "2": {
+    "dictID": "0x05628246",
+    "file": "DATA2/CHARCUST/CHARCUST_0x5628246.png"
+   },
+   "3": {
+    "dictID": "0x0E6C08A3",
+    "file": "DATA2/CHARCUST/CHARCUST_0xE6C08A3.png"
+   },
+   "4": {
+    "dictID": "0x5C8EA7CC",
+    "file": "DATA2/CHARCUST/CHARCUST_0x5C8EA7CC.png"
+   }
+  }
+ },
+ "note": "race->skin-tint index and race->default-armorSet still TODO (not in SetResources)"
+}

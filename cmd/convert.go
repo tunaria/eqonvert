@@ -143,6 +143,13 @@ func stampOutputDir(inputPath string) {
 // already moves.
 var progressStep func()
 
+// activeAppearance holds the resolved CHARCUST appearance for this run when
+// --apply-appearance is set (nil otherwise). Like progressStep it is a
+// package-global set at the top of the convert command, threaded into
+// generateGLB without widening every intermediate signature. Nil ⇒ default
+// export path (byte-for-byte unchanged).
+var activeAppearance *gltf.AppearanceSpec
+
 var convertCmd = &cobra.Command{
 	Use:   "convert <path>",
 	Short: "Convert an EQOA asset file, directory, or disc image to GLB",
@@ -168,6 +175,10 @@ brew install ffmpeg libopenmpt`,
 		// Source-aware guard: refuse to mix a different input into a folder that
 		// already holds an export (see guardOutputDir). Runs before any work.
 		if err = guardOutputDir(path); err != nil {
+			return err
+		}
+		// --apply-appearance: resolve the CHARCUST appearance once (nil ⇒ default export).
+		if activeAppearance, err = resolveAppearanceSpec(path); err != nil {
 			return err
 		}
 		// Stamp the manifest only on an error-free return, so an aborted or hung
@@ -771,7 +782,13 @@ func generateGLB(r io.ReadSeeker, asset *eqoa.Asset, order binary.ByteOrder, pre
 	// must BLEND; zone/environment sprites keep foliage cutouts on MASK to avoid
 	// colored halos, so only opt character content into the gradient→BLEND upgrade.
 	blendGradients := strings.HasPrefix(prefix, "CHAR") || prefix == "ITEM"
-	rootIdx, err := gltf.ExportAssetToBuilder(b, r, asset, order, registry, blendGradients)
+	var rootIdx int
+	var err error
+	if activeAppearance != nil && strings.HasPrefix(prefix, "CHAR") {
+		rootIdx, err = gltf.ExportAssetToBuilderWithAppearance(b, r, asset, order, registry, blendGradients, activeAppearance)
+	} else {
+		rootIdx, err = gltf.ExportAssetToBuilder(b, r, asset, order, registry, blendGradients)
+	}
 	if err != nil {
 		if verbose {
 			logf("    Error exporting: %v\n", err)
@@ -807,6 +824,9 @@ func generateGLB(r io.ReadSeeker, asset *eqoa.Asset, order binary.ByteOrder, pre
 	}
 	b.WriteGLB(outF)
 	outF.Close()
+	if activeAppearance != nil && strings.HasPrefix(prefix, "CHAR") {
+		writeAppearanceSidecar(outPath, activeAppearance)
+	}
 	if verbose {
 		logf("    → %s\n", outPath)
 	}
@@ -826,5 +846,10 @@ func init() {
 	convertCmd.Flags().BoolVar(&collisionExport, "collision", true, "export zone collision geometry (0x4200 CollBuffer) as a tagged 'collision' node (on by default; --collision=false to omit)")
 	convertCmd.Flags().BoolVar(&markSpawns, "mark-spawns", false, "place a built-in marker at unresolved spawn actors in assembled zones")
 	convertCmd.Flags().Float64Var(&spawnScale, "spawn-scale", 1.0, "size multiplier for spawn markers (world units; markers are small vs a zone)")
+	convertCmd.Flags().StringVar(&applyAppearanceRace, "apply-appearance", "", "apply a race's CHARCUST appearance (hair + outfit + skin tint) to CHAR* models, e.g. 'erudite' (default: off)")
+	convertCmd.Flags().IntVar(&appearanceArmorSet, "armor-set", 1, "CHARCUST armor set 0..8 (0 = bare) used by --apply-appearance")
+	convertCmd.Flags().IntVar(&appearanceHair, "hair", 0, "hair texture index 0..7 used by --apply-appearance")
+	convertCmd.Flags().IntVar(&appearanceTint, "tint", 3, "skin-tint palette index 0..14 used by --apply-appearance (3 = brown)")
+	convertCmd.Flags().StringVar(&appearanceAssetRoot, "appearance-assets", appearanceAssetRoot, "root of the extracted textures (EQOAF_OUTPUT) that --apply-appearance loads from")
 	rootCmd.AddCommand(convertCmd)
 }
