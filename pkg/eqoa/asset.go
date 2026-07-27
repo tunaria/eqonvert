@@ -21,6 +21,13 @@ type Asset struct {
 	Attachments []HSpriteAttachment
 	// AttachmentsErr is set when a 0x2500 object exists but failed to parse.
 	AttachmentsErr error
+	// AttachSlots is the 0x2920 CSpriteASlotList belonging to Hierarchy: which
+	// joint each of a CSprite's item-attach slots hangs off. This is the
+	// character-side counterpart of Attachments — a CSprite carries 0x2920 and
+	// never 0x2500, an HSprite the reverse.
+	AttachSlots []CSpriteAttachSlot
+	// AttachSlotsErr is set when a 0x2920 object exists but failed to parse.
+	AttachSlotsErr error
 }
 
 func IsSprite(objType uint16) bool {
@@ -76,6 +83,13 @@ func LoadAsset(r io.ReadSeeker, obj *ESFObject, order binary.ByteOrder) (*Asset,
 	// the optional 0x2450 triggers, then 0x2500 — all from the same child list.
 	attachObj := findSiblingAfter(obj, hierObj, 0x2500)
 
+	// A CSprite's 0x2920 attach-slot list sits in the same place relative to the
+	// hierarchy: ParseCSpriteObj (@ 0x0040e5a8) reads 0x2400, then the 0x5000
+	// bone map, the optional 0x2450 triggers, the skin list, the play list, the
+	// optional node-ID list, and only then 0x2920 — all from the CSprite's own
+	// child list.  (0x2920 is emitted only when the CSprite's ObjectVersion != 0.)
+	slotObj := findSiblingAfter(obj, hierObj, 0x2920)
+
 	asset.MatPalObj = matPalObj
 
 	for _, pObj := range primObjs {
@@ -115,6 +129,20 @@ func LoadAsset(r io.ReadSeeker, obj *ESFObject, order binary.ByteOrder) (*Asset,
 				asset.AttachmentsErr = err
 			} else {
 				asset.Attachments = at
+			}
+		}
+	}
+
+	if slotObj != nil {
+		body, err := slotObj.ReadBody(r)
+		if err != nil {
+			asset.AttachSlotsErr = err
+		} else {
+			sl, err := ParseCSpriteAttachSlots(body, order)
+			if err != nil {
+				asset.AttachSlotsErr = err
+			} else {
+				asset.AttachSlots = sl
 			}
 		}
 	}

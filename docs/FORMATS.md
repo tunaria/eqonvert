@@ -75,6 +75,7 @@ families:
 | 0x2000–0x2Fxx | Sprites: renderable entities of all kinds |
 | 0x2400 | Skeleton (see [ANIMATION.md](ANIMATION.md)) |
 | 0x2500 | Attachments — what hangs off which skeleton node (see [Attachments](#attachments--hspriteattachments-0x2500)) |
+| 0x2920 | CSprite attach slots — where a character holds an item (see [Attach slots](#attach-slots--cspriteaslotlist-0x2920)) |
 | 0x2600 | Animation set (see [ANIMATION.md](ANIMATION.md)) |
 | 0x5000 | RefMap — generic int32→int32 dictionary (bone maps, sound refs) |
 | 0x3000–0x32xx | Zone structures: rooms, terrain tables, actors |
@@ -97,7 +98,8 @@ A "sprite" is any renderable entity. Character models are usually a
 ├── 0x2610 (animation list)     (N × 0x2600 HSpriteAnim)
 ├── 0x2400 HSpriteHierarchy     (skeleton)
 ├── 0x5000 RefMap               (bone map — immediately AFTER the hierarchy)
-└── 0x2450 HSpriteTriggers, misc
+├── 0x2450 HSpriteTriggers, misc
+└── 0x2920 CSpriteASlotList     (attach slots — where held items go)
 ```
 
 ⚠️ Sprites carry **multiple 0x5000 RefMaps** with different meanings. The
@@ -105,8 +107,8 @@ bone map is specifically the one following the 0x2400 hierarchy in the same
 child list (the engine's HSprite parser `FUN_0040cdb0` reads them in that
 order). Grabbing "the first RefMap in the tree" silently yields the sound-
 reference map and breaks all animations. See `findSiblingAfter` in
-`pkg/eqoa/asset.go`, which resolves both the bone map and the 0x2500
-attachment array by the same "sibling after the hierarchy" rule.
+`pkg/eqoa/asset.go`, which resolves the bone map, the 0x2500 attachment array
+and the 0x2920 attach-slot list by the same "sibling after the hierarchy" rule.
 
 ## Attachments — HSpriteAttachments (0x2500)
 
@@ -133,18 +135,68 @@ no offset when attaching — `Attach__9VIHSprite` stores just `{sprite, node}`
 and the item inherits that node's transform, which *is* the grip.
 
 ⚠️ **`CSprite` (0x2700) has no 0x2500.** Character models place held items
-through a different object, `0x2920` (the attach-slot list: `int32 count`, then
-`int32 slotIndex, int32 nodeIndex` pairs), which `VICSprite::AttachItem` reads
-at `base + 0x110c + slot*0xc`. Measured on the beta disc: `CHAR.ESF` has 390
-CSprites, 390 × 0x2920 and **zero** 0x2500; `ITEM.ESF` and `SCENE.ESF` have one
-0x2500 per HSprite. eqonvert parses 0x2500 only — 0x2920 is not yet decoded.
+through 0x2920 instead — see below. Measured: retail `char.esf` has 568
+CSprites, 568 × 0x2920 and **zero** 0x2500 (beta `CHAR.ESF`: 390/390/0);
+`item.esf` and `SCENE.ESF` have one 0x2500 per HSprite and no 0x2920. The two
+never appear on the same sprite.
+
+## Attach slots — CSpriteASlotList (0x2920)
+
+A `CSprite` (0x2700) carries exactly one 0x2920 list, in the same place relative
+to its hierarchy that an HSprite's 0x2500 occupies: `ParseCSpriteObj`
+(@ 0x0040e5a8) reads 0x2400, the 0x5000 bone map, the optional 0x2450 triggers,
+the skin list, the play list, the optional node-ID list, and then 0x2920 — only
+when the CSprite's `ObjectVersion != 0`. It binds each of the sprite's item-
+attach slots to a joint:
+
+```
+int32 count
+repeat count times (8 bytes):
+  int32 Slot       the VICSpriteAttachSlot index, 0..2
+  int32 NodeIndex  a 0x2400 joint index (-1 = slot has no attach point)
+```
+
+`ParseCSpriteASlotList__10VIESFParse` (@ 0x0040eff8) writes each pair straight
+into the sprite's slot table at `slot*0xc + cSprite + 0x110c`, which is exactly
+where `VICSprite::AttachItem` (@ 0x00401a28) reads it back. **The node index is
+the whole placement**, as with 0x2500: no rotation, no offset — the item
+inherits the joint's transform, which *is* the grip.
+
+There are exactly **three** slots. The table is a fixed inline array of 12-byte
+entries and the next member (the per-slot attach handles) starts at `+0x1130`,
+so it spans `0x1130-0x110c = 3 × 0xc`; both callers of `AttachItem` loop
+`slot < 3`. The parser writes without a bounds check, so an out-of-range slot
+would corrupt adjacent state — `ParseCSpriteAttachSlots` rejects it.
+
+A `count` of 0 is normal, not an error (5 of 568 retail CSprites, 9 of 390 beta).
+Most carry two or three slots.
+
+⚠️ **The `VICSpriteAttachSlot` enumerator names are not recoverable** from the
+shipped binary — every call site loops over the slots generically — so eqonvert
+emits the raw index rather than inventing labels. What *is* evidenced:
+
+* Slots **0 and 1 are the weapon-capable ones**. `SetAttackAction__9VICSprite`
+  (@ 0x004016a8) rejects `slot >= 2`, and its caller only calls it `if (slot < 2)`.
+* Slots 0 and 1 bind to **opposite sides of the body**: across the 563 retail
+  CSprites with slots, slot 0's joint has model-space X < 0 in 495 cases and
+  slot 1's has X >= 0 in 489.
+* Slot 2 sits on the **same side as slot 1 but inboard of it** — e.g. X=+0.560
+  against slot 1's +0.705 on sprite 0xDC3B344D — i.e. further up the same arm,
+  and it cannot hold a weapon.
 
 ### Export representation
 
-Sprites with attachments get a `PREFIX_…_attach.json` sidecar beside their
-`.glb`, listing each record (resolved `resource` name, `dict_id`, `attach`
-mode) plus a `joints` table mapping every source `node_index` to the glTF node
-that carries it. The same identity is in the GLB itself three ways: the joint's
+Sprites with either kind of record get a `PREFIX_…_attach.json` sidecar beside
+their `.glb`, carrying a `joints` table that maps every source `node_index` to
+the glTF node holding it, plus whichever record set applies:
+
+* `attachments` (0x2500) — each record's resolved `resource` name, `dict_id`
+  and `attach` mode.
+* `attach_slots` (0x2920) — each `slot` with its `node_index`, `node_name` and
+  `gltf_node`. Parent the item to `gltf_node`; a slot whose `node_index` is -1
+  resolves to no node.
+
+The same node identity is in the GLB itself three ways: the joint's
 `Joint_<node_index>` name, the skin's `joints` array (index-aligned with the
 0x2400 hierarchy, so `skin.joints[node_index]` is the node), and each joint
 node's `extras.node_index`.

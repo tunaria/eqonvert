@@ -33,16 +33,31 @@ type attachRecordJSON struct {
 	GLTFNode  *int   `json:"gltf_node,omitempty"`
 }
 
+// attachSlotJSON is one 0x2920 CSpriteASlotList record — the slot → joint
+// binding that places a held weapon or shield on a character — resolved against
+// the exported skeleton.
+type attachSlotJSON struct {
+	Slot      int32  `json:"slot"`
+	NodeIndex int32  `json:"node_index"`
+	NodeName  string `json:"node_name,omitempty"`
+	GLTFNode  *int   `json:"gltf_node,omitempty"`
+}
+
 // writeAttachmentSidecar emits PREFIX_..._attach.json beside the model GLB,
-// carrying the asset's 0x2500 HSpriteAttachments records plus the node-index →
-// glTF-node mapping needed to resolve them. The records are the only placement
-// information a held item gets: the engine applies no extra rotation or offset,
-// the item simply inherits the named node's transform.
+// carrying the asset's attach records plus the node-index → glTF-node mapping
+// needed to resolve them. Those records are the only placement information a
+// held item gets: the engine applies no extra rotation or offset, the item
+// simply inherits the named node's transform.
+//
+// Two disjoint kinds appear, one per sprite kind: an HSprite's 0x2500
+// HSpriteAttachments (which resource hangs off which joint) and a CSprite's
+// 0x2920 CSpriteASlotList (which joint each item-attach slot binds to). They
+// share the joints table, so both go in the one sidecar.
 //
 // glbPath is the .glb just written; it names the sidecar and is echoed in the
-// payload. No file is written when the asset has no attachments.
+// payload. No file is written when the asset has neither kind of record.
 func writeAttachmentSidecar(asset *eqoa.Asset, b *gltf.Builder, glbPath string) error {
-	if len(asset.Attachments) == 0 {
+	if len(asset.Attachments) == 0 && len(asset.AttachSlots) == 0 {
 		return nil
 	}
 
@@ -89,12 +104,28 @@ func writeAttachmentSidecar(asset *eqoa.Asset, b *gltf.Builder, glbPath string) 
 		records = append(records, rec)
 	}
 
+	slots := make([]attachSlotJSON, 0, len(asset.AttachSlots))
+	for _, s := range asset.AttachSlots {
+		rec := attachSlotJSON{Slot: s.Slot, NodeIndex: s.NodeIndex}
+		if s.HasNode() {
+			rec.NodeName = gltf.JointNodeName(int(s.NodeIndex))
+			rec.GLTFNode = gltfNode(s.NodeIndex)
+		}
+		slots = append(slots, rec)
+	}
+
 	payload := map[string]any{
-		"dict_id":     fmt.Sprintf("0x%08X", asset.ID),
-		"model":       filepath.Base(glbPath),
-		"note":        "0x2500 HSpriteAttachments. attach=node: parent the resource to gltf_node and inherit its transform — the engine applies no extra rotation or offset. attach=skin: the resource is skinned to the whole hierarchy (node_index -1).",
-		"joints":      joints,
-		"attachments": records,
+		"dict_id": fmt.Sprintf("0x%08X", asset.ID),
+		"model":   filepath.Base(glbPath),
+		"joints":  joints,
+	}
+	if len(records) > 0 {
+		payload["note"] = "0x2500 HSpriteAttachments. attach=node: parent the resource to gltf_node and inherit its transform — the engine applies no extra rotation or offset. attach=skin: the resource is skinned to the whole hierarchy (node_index -1)."
+		payload["attachments"] = records
+	}
+	if len(slots) > 0 {
+		payload["slots_note"] = "0x2920 CSpriteASlotList — how a character holds an item. Parent the item to gltf_node and inherit its transform; the engine applies no extra rotation or offset. slot is the raw VICSpriteAttachSlot index (0..2); the enumerator names are not recoverable from the shipped binary, so none are invented here. Slots 0 and 1 are the weapon-capable ones (SetAttackAction rejects slot >= 2) and bind to opposite sides of the body; slot 2 sits inboard on the same side as slot 1. node_index -1 means the slot has no attach point."
+		payload["attach_slots"] = slots
 	}
 
 	path := strings.TrimSuffix(glbPath, ".glb") + attachSidecarSuffix

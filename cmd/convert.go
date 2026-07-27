@@ -737,6 +737,9 @@ func processObject(r io.ReadSeeker, obj *eqoa.ESFObject, order binary.ByteOrder,
 					if asset.AttachmentsErr != nil {
 						logf("    Warning: attachments dropped: %v\n", asset.AttachmentsErr)
 					}
+					if asset.AttachSlotsErr != nil {
+						logf("    Warning: attach slots dropped: %v\n", asset.AttachSlotsErr)
+					}
 				}
 				generateGLB(r, asset, order, prefix, registry, verbose, outDir)
 				*sprites++
@@ -809,8 +812,9 @@ func generateGLB(r io.ReadSeeker, asset *eqoa.Asset, order binary.ByteOrder, pre
 	}
 
 	// Held items (weapons, shields) and skinned overlays are placed solely by
-	// the sprite's 0x2500 attachment records; emit them beside the GLB so a
-	// consumer can resolve node_index → glTF node.
+	// the sprite's 0x2500 attachment records — 0x2920 attach slots for a
+	// character; emit them beside the GLB so a consumer can resolve
+	// node_index → glTF node.
 	if err := writeAttachmentSidecar(asset, b, outPath); err != nil && verbose {
 		logf("    Warning: attachment sidecar: %v\n", err)
 	}

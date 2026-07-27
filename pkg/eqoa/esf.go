@@ -84,6 +84,7 @@ var objTypeInfo = map[uint16]objTypeInfoEntry{
 	0x2700: {name: "CSprite", extractsDictID: true},
 	0x2710: {name: "CSpriteHeader"},
 	0x2800: {name: "CSpriteArray"},
+	0x2920: {name: "CSpriteASlotList"},
 	0x2a10: {name: "LODSprite", extractsDictID: true},
 	0x2a20: {name: "LodSpriteArray"},
 	0x2b00: {name: "PointLight"},
