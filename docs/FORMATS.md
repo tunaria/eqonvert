@@ -74,6 +74,7 @@ families:
 | 0x1200/0x1210 | Mesh data (static / skinned) |
 | 0x2000–0x2Fxx | Sprites: renderable entities of all kinds |
 | 0x2400 | Skeleton (see [ANIMATION.md](ANIMATION.md)) |
+| 0x2500 | Attachments — what hangs off which skeleton node (see [Attachments](#attachments--hspriteattachments-0x2500)) |
 | 0x2600 | Animation set (see [ANIMATION.md](ANIMATION.md)) |
 | 0x5000 | RefMap — generic int32→int32 dictionary (bone maps, sound refs) |
 | 0x3000–0x32xx | Zone structures: rooms, terrain tables, actors |
@@ -103,8 +104,50 @@ A "sprite" is any renderable entity. Character models are usually a
 bone map is specifically the one following the 0x2400 hierarchy in the same
 child list (the engine's HSprite parser `FUN_0040cdb0` reads them in that
 order). Grabbing "the first RefMap in the tree" silently yields the sound-
-reference map and breaks all animations. See `findBoneMapSibling` in
-`pkg/eqoa/asset.go`.
+reference map and breaks all animations. See `findSiblingAfter` in
+`pkg/eqoa/asset.go`, which resolves both the bone map and the 0x2500
+attachment array by the same "sibling after the hierarchy" rule.
+
+## Attachments — HSpriteAttachments (0x2500)
+
+An `HSprite` (0x2200) carries exactly one 0x2500 array, immediately after its
+0x2400 hierarchy / 0x5000 bone map / optional 0x2450 triggers. It records what
+hangs off which skeleton node:
+
+```
+int32 count
+repeat count times (12 bytes):
+  int32  Type       0 → SimpleSprite (0x2000), 1 → SkinSubSprite (0x2320)
+  uint32 DictID     the attached resource (0 = nothing attached, skipped)
+  int32  NodeIndex  -1 = skin onto the whole hierarchy, else a 0x2400 joint index
+```
+
+`Type` selects which resource namespace `DictID` is resolved in — the engine
+maps 0 → VIResourceType 4 and 1 → VIResourceType 7, and errors on any other
+value (`ParseHSpriteAttachments__10VIESFParse` @ 0x0040d470). `NodeIndex`
+indexes the hierarchy's joint array directly: the engine allocates its node
+vector with the 0x2400 joint count and hands out indices in file order.
+
+**The node index is the whole placement.** The engine applies no rotation and
+no offset when attaching — `Attach__9VIHSprite` stores just `{sprite, node}`
+and the item inherits that node's transform, which *is* the grip.
+
+⚠️ **`CSprite` (0x2700) has no 0x2500.** Character models place held items
+through a different object, `0x2920` (the attach-slot list: `int32 count`, then
+`int32 slotIndex, int32 nodeIndex` pairs), which `VICSprite::AttachItem` reads
+at `base + 0x110c + slot*0xc`. Measured on the beta disc: `CHAR.ESF` has 390
+CSprites, 390 × 0x2920 and **zero** 0x2500; `ITEM.ESF` and `SCENE.ESF` have one
+0x2500 per HSprite. eqonvert parses 0x2500 only — 0x2920 is not yet decoded.
+
+### Export representation
+
+Sprites with attachments get a `PREFIX_…_attach.json` sidecar beside their
+`.glb`, listing each record (resolved `resource` name, `dict_id`, `attach`
+mode) plus a `joints` table mapping every source `node_index` to the glTF node
+that carries it. The same identity is in the GLB itself three ways: the joint's
+`Joint_<node_index>` name, the skin's `joints` array (index-aligned with the
+0x2400 hierarchy, so `skin.joints[node_index]` is the node), and each joint
+node's `extras.node_index`.
 
 ## Meshes — PrimBuffer (0x1200) / SkinPrimBuffer (0x1210)
 

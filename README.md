@@ -144,6 +144,7 @@ docs/         Format documentation and the reverse-engineering evidence.
 | Skinned meshes (0x1210) | ✅ |
 | Skeletons (0x2400) | ✅ world-space→local conversion |
 | Animations (0x2600 + 0x5000) | ✅ rotation + translation, named |
+| Attachments (0x2500) | ✅ `…_attach.json` sidecar: which resource hangs off which skeleton node, with a `node_index`→glTF-node table. Node identity is also in the GLB (`Joint_<i>` names, `skin.joints[i]`, `extras.node_index`). Applies to HSprites (props, items, effects) — CSprite characters use the not-yet-decoded 0x2920 slot list |
 | Textures (0x1000) | ✅ all surfaces → PNG, incl. standalone UI sheets, item icons, face textures |
 | Materials (0x1100) | ✅ base color + texture layers |
 | Zones (0x3000 family) | ✅ terrain + placements |

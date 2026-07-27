@@ -3,6 +3,7 @@ package gltf
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"image/png"
 	"io"
@@ -89,6 +90,13 @@ func alphaModeFor(s *eqoa.Surface, blendGradients bool) string {
 	return am
 }
 
+// JointNodeName is the glTF node name given to hierarchy joint i. The index in
+// the name is the joint's index in the source 0x2400 hierarchy — the same value
+// an 0x2500 HSpriteAttachments record's NodeIndex holds — so consumers can
+// resolve an attachment by name alone. Callers that build or read that mapping
+// must go through this function rather than re-spelling the format.
+func JointNodeName(i int) string { return fmt.Sprintf("Joint_%d", i) }
+
 func ExportAssetToBuilder(b *Builder, r io.ReadSeeker, asset *eqoa.Asset, order binary.ByteOrder, registry *eqoa.SurfaceRegistry, blendGradients bool) (int, error) {
 	rootNodeIdx := b.AddNode(Node{Name: fmt.Sprintf("Sprite_0x%X", asset.ID)})
 
@@ -103,10 +111,19 @@ func ExportAssetToBuilder(b *Builder, r io.ReadSeeker, asset *eqoa.Asset, order 
 			// world→local conversion the engine does at load (FUN_0041ae00).
 			rot, pos, scale := asset.Hierarchy.LocalTRS(i)
 			nodeIdx := b.AddNode(Node{
-				Name:        fmt.Sprintf("Joint_%d", i),
+				Name:        JointNodeName(i),
 				Translation: pos[:],
 				Rotation:    quatNorm(rot),
 				Scale:       []float32{scale, scale, scale},
+				// Source node identity, carried explicitly so it survives a
+				// rename or a re-index by any tool in between: i is the joint's
+				// index in the 0x2400 hierarchy, which is exactly the NodeIndex
+				// an 0x2500 HSpriteAttachments record refers to (the engine
+				// hands out node indices in 0x2400 file order — see
+				// ParseHSpriteHierarchy @ 0x0040d168). The Skin's `joints`
+				// array is index-aligned with it too, so
+				// skin.joints[node_index] resolves to this glTF node.
+				Extras: json.RawMessage(fmt.Sprintf(`{"node_index":%d}`, i)),
 			})
 			jointNodeIndices = append(jointNodeIndices, nodeIdx)
 		}

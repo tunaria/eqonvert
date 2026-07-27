@@ -16,6 +16,11 @@ type Asset struct {
 	Actions      []*ActionSet
 	BoneMap      map[int32]int32 // 0x5000: animation channel BoneID → joint index
 	MatPalObj    *ESFObject
+	// Attachments is the 0x2500 HSpriteAttachments array belonging to Hierarchy:
+	// which resource (weapon, shield, skin) hangs off which of its joints.
+	Attachments []HSpriteAttachment
+	// AttachmentsErr is set when a 0x2500 object exists but failed to parse.
+	AttachmentsErr error
 }
 
 func IsSprite(objType uint16) bool {
@@ -64,7 +69,12 @@ func LoadAsset(r io.ReadSeeker, obj *ESFObject, order binary.ByteOrder) (*Asset,
 	// hierarchy first, then FUN_0040e430 expects the very next object to be
 	// 0x5000).  Sprites also carry other 0x5000 RefMaps (sound/effect refs) at
 	// container level, so "first 0x5000 anywhere" picks the wrong one.
-	boneMapObj := findBoneMapSibling(obj, hierObj)
+	boneMapObj := findSiblingAfter(obj, hierObj, 0x5000)
+
+	// The 0x2500 attachment array is likewise a sibling that follows the
+	// hierarchy: ParseHSpriteObj (FUN_0040cdb0) reads 0x2400, then 0x5000, then
+	// the optional 0x2450 triggers, then 0x2500 — all from the same child list.
+	attachObj := findSiblingAfter(obj, hierObj, 0x2500)
 
 	asset.MatPalObj = matPalObj
 
@@ -91,6 +101,20 @@ func LoadAsset(r io.ReadSeeker, obj *ESFObject, order binary.ByteOrder) (*Asset,
 			m, err := ParseBoneMap(body, order)
 			if err == nil {
 				asset.BoneMap = m
+			}
+		}
+	}
+
+	if attachObj != nil {
+		body, err := attachObj.ReadBody(r)
+		if err != nil {
+			asset.AttachmentsErr = err
+		} else {
+			at, err := ParseHSpriteAttachments(body, order)
+			if err != nil {
+				asset.AttachmentsErr = err
+			} else {
+				asset.Attachments = at
 			}
 		}
 	}
@@ -134,26 +158,29 @@ func collectInternal(obj *ESFObject, prims *[]*ESFObject, matPal **ESFObject, hi
 	}
 }
 
-// findBoneMapSibling locates the 0x5000 BoneMap that belongs to the given
-// hierarchy object: the first 0x5000 appearing after the hierarchy in its
-// parent's child list.  Returns nil when the hierarchy is absent or no such
-// sibling exists.
-func findBoneMapSibling(root *ESFObject, hier *ESFObject) *ESFObject {
-	if hier == nil {
+// findSiblingAfter locates the first object of type objType that appears after
+// anchor in anchor's own child list — the way the engine's sequential parser
+// consumes an HSprite's trailing objects (0x5000 BoneMap, 0x2500 attachments)
+// right after the 0x2400 hierarchy.  Returns nil when anchor is absent or no
+// such sibling exists.  Scoping to anchor's siblings matters: a sprite also
+// carries unrelated objects of the same type at container level (e.g. 0x5000
+// sound/effect RefMaps), and "first match anywhere" would pick the wrong one.
+func findSiblingAfter(root *ESFObject, anchor *ESFObject, objType uint16) *ESFObject {
+	if anchor == nil {
 		return nil
 	}
 	var search func(obj *ESFObject) *ESFObject
 	search = func(obj *ESFObject) *ESFObject {
-		hierIdx := -1
+		anchorIdx := -1
 		for i, child := range obj.Children {
-			if child == hier {
-				hierIdx = i
+			if child == anchor {
+				anchorIdx = i
 				break
 			}
 		}
-		if hierIdx >= 0 {
-			for _, child := range obj.Children[hierIdx+1:] {
-				if uint16(child.Header.ObjectType) == 0x5000 {
+		if anchorIdx >= 0 {
+			for _, child := range obj.Children[anchorIdx+1:] {
+				if uint16(child.Header.ObjectType) == objType {
 					return child
 				}
 			}
