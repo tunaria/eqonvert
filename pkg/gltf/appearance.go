@@ -14,11 +14,19 @@ import (
 // Slot model (from docs/ARMOR_TEXTURE_MAPPING.md + CHAR_CREATION.md §1): the body
 // is a single VISkinSprite with FIVE VICSpriteTextSlot material slots (the applier
 // loops iVar8 = 0..4). SetArmorSet swaps each slot's texture; a tint RGBA multiplies
-// the bare-skin slots; SetHair swaps the head material's texture. The EXACT
-// material-palette-index → body-slot mapping is unresolved (blocked on a live PINE
-// memory read — see the RE doc), so the mapping here is a PROVISIONAL HEURISTIC:
-// character body materials are taken in palette order and assigned slot = idx mod 5.
-// This is meant to be visually spot-checked, not trusted as exact.
+// the bare-skin slots; SetHair swaps the head material's texture.
+//
+// EXPERIMENTAL — THE SLOT MAPPING BELOW IS KNOWN TO BE WRONG. Materials are taken in
+// palette order and assigned slot = idx mod 5. That cannot be right: material indices
+// are not stable between races (the legs are material 0 on one race and 5 or 6 on
+// others), so no ordinal rule holds, and the body resolves into more regions than five
+// — head, chest, legs, feet, hand and bracer, with left and right addressed separately.
+//
+// This was written believing the true mapping was blocked on a live memory read. It is
+// not: it can be derived from the exported geometry, by measuring vertical placement
+// against the shoulder line and finding the arms as a mirrored pair with no midline
+// geometry. Rebuilding this on that derivation is the fix; until then the flags are
+// hidden and nothing should depend on where these textures land.
 type AppearanceSpec struct {
 	Race     string // e.g. "erudite" (echoed into extras; not used for slot math)
 	ArmorSet int    // 0 = bare (no armor textures applied); 1..8 = a CHARCUST set

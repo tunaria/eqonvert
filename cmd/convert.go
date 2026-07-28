@@ -846,10 +846,28 @@ func init() {
 	convertCmd.Flags().BoolVar(&collisionExport, "collision", true, "export zone collision geometry (0x4200 CollBuffer) as a tagged 'collision' node (on by default; --collision=false to omit)")
 	convertCmd.Flags().BoolVar(&markSpawns, "mark-spawns", false, "place a built-in marker at unresolved spawn actors in assembled zones")
 	convertCmd.Flags().Float64Var(&spawnScale, "spawn-scale", 1.0, "size multiplier for spawn markers (world units; markers are small vs a zone)")
-	convertCmd.Flags().StringVar(&applyAppearanceRace, "apply-appearance", "", "apply a race's CHARCUST appearance (hair + outfit + skin tint) to CHAR* models, e.g. 'erudite' (default: off)")
+	// Appearance baking is EXPERIMENTAL and hidden from help.
+	//
+	// It assigns a body slot by taking character materials in palette order as
+	// slot = index mod 5, which is wrong. Material indices are not stable between
+	// races -- the legs are material 0 on one race and 5 or 6 on others -- so an
+	// ordinal rule cannot hold, and there are more regions than five (head, chest,
+	// legs, feet, hand and bracer, with left and right addressed separately). The
+	// mapping is instead derivable from the geometry: vertical placement against the
+	// shoulder line separates the bands, and a mirrored pair with no midline geometry
+	// finds the arms.
+	//
+	// The premise recorded in pkg/gltf/appearance.go -- that this is blocked on a live
+	// memory read -- is also no longer true. Until the baker is rebuilt on the derived
+	// map, these stay hidden so nothing depends on output that is placed wrongly. The
+	// flags still work when named explicitly, and the default export is untouched.
+	convertCmd.Flags().StringVar(&applyAppearanceRace, "apply-appearance", "", "EXPERIMENTAL, body-slot mapping is known wrong: bake a race's CHARCUST appearance onto CHAR* models")
 	convertCmd.Flags().IntVar(&appearanceArmorSet, "armor-set", 1, "CHARCUST armor set 0..8 (0 = bare) used by --apply-appearance")
 	convertCmd.Flags().IntVar(&appearanceHair, "hair", 0, "hair texture index 0..7 used by --apply-appearance")
 	convertCmd.Flags().IntVar(&appearanceTint, "tint", 3, "skin-tint palette index 0..14 used by --apply-appearance (3 = brown)")
-	convertCmd.Flags().StringVar(&appearanceAssetRoot, "appearance-assets", appearanceAssetRoot, "root of the extracted textures (EQOAF_OUTPUT) that --apply-appearance loads from")
+	convertCmd.Flags().StringVar(&appearanceAssetRoot, "appearance-assets", appearanceAssetRoot, "root of the extracted textures that --apply-appearance loads from")
+	for _, f := range []string{"apply-appearance", "armor-set", "hair", "tint", "appearance-assets"} {
+		_ = convertCmd.Flags().MarkHidden(f)
+	}
 	rootCmd.AddCommand(convertCmd)
 }
