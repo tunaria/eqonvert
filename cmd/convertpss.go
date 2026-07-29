@@ -21,9 +21,15 @@ func convertPSSFile(path, outDir string, verbose bool) {
 	}
 	base := filepath.Base(path)
 	rawOut := filepath.Join(outDir, base)
-	if err := copyFile(path, rawOut); err != nil {
-		logf("Error copying %s: %v\n", base, err)
-		return
+	// The caller may already have materialized the .PSS at this exact path -- that is
+	// how the disc and single-file routes hand ffmpeg something to open. Copying then
+	// would copy the file onto itself, and os.Create truncates the destination before
+	// anything is read, leaving nothing behind and handing ffmpeg an empty file.
+	if !sameFile(path, rawOut) {
+		if err := copyFile(path, rawOut); err != nil {
+			logf("Error copying %s: %v\n", base, err)
+			return
+		}
 	}
 
 	ffmpeg, err := exec.LookPath("ffmpeg")
@@ -171,6 +177,21 @@ func buildWAV(pcm []byte, sampleRate, channels int) []byte {
 }
 
 // copyFile copies src to dst verbatim.
+// sameFile reports whether two paths name the same file on disk, so a copy that would
+// destroy its own source can be skipped. Compares by inode rather than by string, since
+// the two paths reach it by different routes and need not look alike.
+func sameFile(a, b string) bool {
+	fa, err := os.Stat(a)
+	if err != nil {
+		return false
+	}
+	fb, err := os.Stat(b)
+	if err != nil {
+		return false
+	}
+	return os.SameFile(fa, fb)
+}
+
 func copyFile(src, dst string) error {
 	in, err := os.Open(src)
 	if err != nil {
