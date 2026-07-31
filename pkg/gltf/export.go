@@ -62,6 +62,106 @@ func sanitizeFloat(f float32) float32 {
 	return f
 }
 
+// emitBlendFromMaterial forces alphaMode BLEND wherever the source material's blend mode is
+// non-zero (modes 1-4 all set PRIM.ABE and write GS ALPHA, i.e. a genuinely translucent pass).
+//
+// It is OFF because being faithful to the source made the result worse. On PS2 those passes draw
+// in a fixed, authored order with Z-write suppressed; glTF has no way to express draw order, so a
+// BLEND material lands in the viewer's transparent pass and is ordered by distance instead.
+// Layered geometry then drops out -- on the phantom, the chains hanging over its robe disappear
+// when viewed head-on, which is far more objectionable than the chains being too opaque.
+//
+// So this is a case where the disassembly is right about the hardware and wrong about the export.
+// The blend mode is recorded in material extras regardless (see matExtras), which is the better
+// home for it: a renderer that controls its own draw order can act on it, while a generic glTF
+// viewer is not handed an ordering problem it cannot solve.
+//
+// Turn on with SetBlendFromMaterial / --blend-from-material to inspect the difference.
+var emitBlendFromMaterial = false
+
+// SetBlendFromMaterial toggles deriving alphaMode from the source blend mode. See
+// emitBlendFromMaterial for why this defaults to off.
+func SetBlendFromMaterial(on bool) { emitBlendFromMaterial = on }
+
+// gradientBlendBar is the TranslucentFraction above which a character/item MASK surface is
+// upgraded to BLEND. Tunable because the right value is a judgement call the measurements cannot
+// settle, and the current one is known to be marginal:
+//
+// A CHARCUST hair sheet measures tf = 0.052 and so clears the 0.05 bar by two thousandths, which
+// is why hair exports as BLEND. Against the hardware that is the wrong call — the client draws
+// 79.8% of the sheet, glTF MASK@0.5 draws 84.3%, BLEND draws ~96%, so MASK is the closer match by
+// a wide margin and the "edges only" symptom cannot arise from a sheet that is 80% dense.
+// Genuinely sheer character surfaces measure tf 0.21-0.24, so a bar near 0.10 separates the two
+// cleanly.
+//
+// Set to 0.10 after visual confirmation through the A/B harness: MASK hair and, more visibly,
+// solid headwear both read better than the BLEND versions. Faithful is not automatically better --
+// this session twice found the opposite -- so the number was checked by eye before being adopted.
+// Override with --gradient-blend-bar.
+var gradientBlendBar = 0.10
+
+// SetGradientBlendBar sets the MASK-to-BLEND threshold for character/item surfaces.
+func SetGradientBlendBar(v float64) { gradientBlendBar = v }
+
+// maskCutoff is the glTF alphaCutoff written for MASK materials.
+//
+// 0.5 is not what the hardware does. The client alpha-tests at AREF=128 GEQUAL against a texture
+// alpha byte that is a full 0-255 range, so it draws exactly the texels with raw alpha >= 128.
+// eqonvert's palette rescale maps raw >= 128 to PNG 255 and raw < 128 to raw*2 -- verified over
+// 7.9M exported texels: no odd alpha value below 255 ever occurs, and there are exactly 128
+// distinct sub-255 values. So PNG alpha == 255 corresponds precisely to raw >= 128, and a cutoff
+// just above 254/255 reproduces the hardware's set exactly.
+//
+// At 0.5 the export instead draws every texel with PNG alpha >= 128, i.e. raw >= 64 -- twice as
+// permissive as the console. Measured over-draw on Frontiers content:
+//
+//	CHAR    173 surfaces   mean  1.72 pts   max 17.35
+//	ARENA    10 surfaces   mean 13.05 pts   max 54.70
+//	LAVASTM  11 surfaces   mean  4.61 pts   max  9.09
+//
+// Set to 0.999 after visual confirmation on Qeynos (buildings, foliage and coastline together).
+// The caution that kept it at 0.5 -- that removing half a foliage surface's texels might read as
+// sparse or shredded -- turned out to be backwards. At 0.5 the extra texels are not extra
+// coverage, they are the INTERIORS OF HOLES: a lattice window rendered with opaque black diamonds
+// instead of showing grass through the trellis, and shutters with black blotches instead of the
+// wall behind. 0.999 resolves both, and foliage was confirmed better too.
+//
+// Override with --alpha-cutoff.
+var maskCutoff = float32(0.999)
+
+// charMaskCutoff is the same threshold for CHARACTER and ITEM content, and it is deliberately
+// NOT the console value.
+//
+// 0.999 is faithful, and on characters it is a severe regression. A face is not a texture stretched
+// over the head; it is an alpha-masked detail overlay on top of a plain skin material. Discarding
+// every texel below raw 128 removes most of that overlay, so the features bunch toward the centre
+// of the face and the surrounding area falls back to base skin -- which then disagrees in colour
+// with the neck. Hair suffers the same way. Confirmed visually on Elf Male and Dark Elf.
+//
+// The zone case that justified 0.999 does not apply here: there, the sub-128 texels were the
+// INTERIORS of cutout holes and drawing them produced opaque black lattice windows. On a character
+// they are the body of the artwork. Same number, opposite meaning, so the threshold follows the
+// content split the exporter already makes (blendGradients).
+//
+// Override with --char-alpha-cutoff.
+var charMaskCutoff = float32(0.5)
+
+// SetMaskCutoff sets the glTF alphaCutoff for zone/environment MASK materials. See maskCutoff.
+func SetMaskCutoff(v float64) { maskCutoff = float32(v) }
+
+// SetCharMaskCutoff sets the glTF alphaCutoff for character/item MASK materials.
+// See charMaskCutoff for why it differs from the zone value.
+func SetCharMaskCutoff(v float64) { charMaskCutoff = float32(v) }
+
+// cutoffFor picks the MASK threshold by content type. blendGradients is true for character and
+// item content, false for zone/environment content -- the same signal alphaModeFor uses.
+func cutoffFor(blendGradients bool) float32 {
+	if blendGradients {
+		return charMaskCutoff
+	}
+	return maskCutoff
+}
+
 // alphaModeFor returns the glTF alpha mode for a surface. When blendGradients is
 // set (character/item content), a MASK gradient (sheer cloth / translucent trim)
 // is upgraded to BLEND so its semi-transparent body isn't hard-discarded by the
@@ -75,7 +175,7 @@ func alphaModeFor(s *eqoa.Surface, blendGradients bool) string {
 	tf := s.TranslucentFraction()
 	// Character/item sheer cloth: even a faint translucency gradient should BLEND
 	// (see the garment-alpha fix).
-	if blendGradients && tf >= 0.05 {
+	if blendGradients && tf >= gradientBlendBar {
 		return "BLEND"
 	}
 	// Predominantly-translucent surfaces (glass, water) must BLEND EVERYWHERE,
@@ -195,6 +295,55 @@ func ExportAssetToBuilderWithAppearance(b *Builder, r io.ReadSeeker, asset *eqoa
 	materialToIndex := make(map[int]int)
 	materialHasTexture := make(map[int]bool)
 
+	// Texture wrapping. wrapMode is a two-bit mask on the material layer, not an enum:
+	// bit 0 clamps U, bit 1 clamps V. Confirmed against the client -- SetLayerWrapMode packs it
+	// into the layer flags and ConstructTextPass unpacks bit 1 into GS CLAMP.WMS and bit 2 into
+	// CLAMP.WMT (0 = REPEAT, 1 = CLAMP). Values above 3 are rejected by the engine.
+	//
+	// This was parsed and then read by nothing, so every texture exported as glTF's default
+	// REPEAT and any surface the game clamps tiled instead -- visible as a band of repeated edge
+	// pixels where a decal or a sky panel should simply stop.
+	//
+	// Wrapping is a property of the material layer while textures are keyed by surface DictID, so
+	// one image can be referenced at two different wrap settings. glTF expresses that as several
+	// Texture objects sharing one Source, which is what the variant map below builds -- and only
+	// when needed, so wrapMode 0 keeps its original texture index and the output is unchanged.
+	samplerIndex := make(map[int32]int)
+	wrapVariant := make(map[[2]int64]int)
+	textureFor := func(dictID uint32, wrapMode int32) (int, bool) {
+		base, ok := surfaceToIndex[dictID]
+		if !ok || wrapMode <= 0 || wrapMode > 3 {
+			return base, ok
+		}
+		key := [2]int64{int64(dictID), int64(wrapMode)}
+		if idx, ok := wrapVariant[key]; ok {
+			return idx, true
+		}
+		sIdx, ok := samplerIndex[wrapMode]
+		if !ok {
+			wrap := func(clamped bool) int {
+				if clamped {
+					return WrapClampToEdge
+				}
+				return WrapRepeat
+			}
+			b.Doc.Samplers = append(b.Doc.Samplers, Sampler{
+				WrapS: wrap(wrapMode&1 != 0),
+				WrapT: wrap(wrapMode&2 != 0),
+			})
+			sIdx = len(b.Doc.Samplers) - 1
+			samplerIndex[wrapMode] = sIdx
+		}
+		s := sIdx
+		b.Doc.Textures = append(b.Doc.Textures, Texture{
+			Source:  b.Doc.Textures[base].Source,
+			Sampler: &s,
+		})
+		idx := len(b.Doc.Textures) - 1
+		wrapVariant[key] = idx
+		return idx, true
+	}
+
 	if asset.MatPalObj != nil {
 		var surfaceArray *eqoa.ESFObject
 		var materialArray *eqoa.ESFObject
@@ -311,6 +460,29 @@ func ExportAssetToBuilderWithAppearance(b *Builder, r io.ReadSeeker, asset *eqoa
 							alphaMode = mode
 						}
 					}
+					// Record what the source material states, including the parts glTF has no
+					// way to represent. Layers beyond the first are the notable case: their
+					// artwork is embedded in the GLB but nothing references it, so without this
+					// it is unreachable bytes.
+					ex := matExtras{LayerCount: len(m.Layers)}
+					if len(m.Layers) > 0 {
+						ex.BlendMode = int(m.Layers[0].BlendMode)
+						ex.WrapMode = int(m.Layers[0].WrapMode)
+						for _, l := range m.Layers[1:] {
+							ex.ExtraLayers = append(ex.ExtraLayers, extraLayer{
+								TexID:     fmt.Sprintf("0x%X", l.TexID),
+								BlendMode: int(l.BlendMode),
+								WrapMode:  int(l.WrapMode),
+								Color:     l.Color,
+							})
+						}
+					}
+
+					// OFF BY DEFAULT -- see SetBlendFromMaterial.
+					if emitBlendFromMaterial && len(m.Layers) > 0 && m.Layers[0].BlendMode != 0 {
+						alphaMode = "BLEND"
+					}
+
 					hasTexture := false
 					gm := Material{
 						Name:        fmt.Sprintf("Material_0x%X", m.DictID),
@@ -322,13 +494,52 @@ func ExportAssetToBuilderWithAppearance(b *Builder, r io.ReadSeeker, asset *eqoa
 						},
 					}
 					if alphaMode == "MASK" {
-						cutoff := float32(0.5)
+						cutoff := cutoffFor(blendGradients)
 						gm.AlphaCutoff = &cutoff
 					}
 					if len(m.Layers) > 0 {
-						if texIdx, ok := surfaceToIndex[m.Layers[0].TexID]; ok {
+						if texIdx, ok := textureFor(m.Layers[0].TexID, m.Layers[0].WrapMode); ok {
 							gm.PBRMetallicRoughness.BaseColorTexture = &TextureInfo{Index: texIdx}
 							hasTexture = true
+						}
+						// The layer's modulate colour: how the client gives each race its skin
+						// tone. Flesh textures are shared between races, and the material
+						// palette in char.esf carries the tint -- an Erudite is (109,83,77) on
+						// the same four surfaces a Human wears at (255,255,255), Barbarians are
+						// (237,219,188). Dark Elves, Gnomes, Dwarves and Trolls have their own
+						// textures and are neutral. Parsed all along and never emitted, which is
+						// why exported Erudites had a correct dark face on a pale body.
+						//
+						// OFF BY DEFAULT (--skin-modulate). Emitting this changed how models
+						// looked in ways that went beyond the intended body tint: reviewed
+						// against the real screens, face textures on several races came out
+						// wrong-coloured and poorly fitted to the head, and the Erudite body
+						// picked up a specular sheen the console never had -- an artifact of
+						// giving a PBR material a very dark albedo, which leaves the constant
+						// dielectric highlight dominating what should be flat, unlit shading.
+						//
+						// The finding itself is solid: the modulate exists, it is the per-race
+						// skin tone, and it was being discarded. What is not settled is how to
+						// express it in glTF. So it is available to experiment with and does not
+						// affect anyone who does not ask for it.
+						//
+						// Only CHROMATIC values are applied even then. Head materials -- face,
+						// eyes, hair -- carry flat greys such as (191,191,191), and emitting
+						// those darkened faces that were already correct. Skin tones observed so
+						// far are all chromatic; note Dark Elf skin is grey but comes from its
+						// own textures with no modulate at all, so it is not a counter-example.
+						c := m.Layers[0].Color
+						chromatic := c[0] != c[1] || c[1] != c[2]
+						if emitSkinModulate && chromatic && c != [4]float32{0, 0, 0, 0} {
+							// Converted to linear before emitting. The console multiplies the
+							// texel in gamma space, whereas glTF's baseColorFactor multiplies in
+							// linear space -- so passing 109/255 = 0.427 straight through lands
+							// far too light. Reproducing a gamma-space multiply k needs a linear
+							// factor of k^2.2, which is exactly the sRGB transfer function.
+							// Alpha is a coverage value, not a colour, and is not converted.
+							gm.PBRMetallicRoughness.BaseColorFactor = []float32{
+								srgbToLinear(c[0]), srgbToLinear(c[1]), srgbToLinear(c[2]), c[3],
+							}
 						}
 					}
 					if !hasTexture {
@@ -362,7 +573,7 @@ func ExportAssetToBuilderWithAppearance(b *Builder, r io.ReadSeeker, asset *eqoa
 						if hairSlot {
 							gm.PBRMetallicRoughness.BaseColorTexture = &TextureInfo{Index: hairTexIdx}
 							gm.AlphaMode = "MASK"
-							cutoff := float32(0.5)
+							cutoff := cutoffFor(blendGradients)
 							gm.AlphaCutoff = &cutoff
 						} else if appearance.ArmorSet != 0 && armorTexIdx[slot] >= 0 {
 							gm.PBRMetallicRoughness.BaseColorTexture = &TextureInfo{Index: armorTexIdx[slot]}
@@ -376,13 +587,13 @@ func ExportAssetToBuilderWithAppearance(b *Builder, r io.ReadSeeker, asset *eqoa
 								float32(appearance.Tint[3]) / 255.0,
 							}
 						}
-						gm.Extras = mustJSON(matExtras{
-							MatIndex:  i,
-							SlotGuess: slot,
-							HairSlot:  hairSlot,
-							Bare:      bare,
-						})
+						mi, sg := i, slot
+						ex.MatIndex = &mi
+						ex.SlotGuess = &sg
+						ex.HairSlot = hairSlot
+						ex.Bare = bare
 					}
+					gm.Extras = mustJSON(ex)
 
 					matIdx := len(b.Doc.Materials)
 					b.Doc.Materials = append(b.Doc.Materials, gm)
@@ -818,3 +1029,23 @@ func exportAnimations(b *Builder, asset *eqoa.Asset, jointNodeIndices []int) {
 }
 
 func ptrInt(i int) *int { return &i }
+
+// srgbToLinear converts an sRGB-encoded component to linear light.
+//
+// Needed because the two pipelines multiply in different spaces: the console applies a material
+// modulate to the texel in gamma space, while glTF's baseColorFactor multiplies after the
+// texture has been decoded to linear. A gamma-space multiply by k is equivalent to a linear
+// multiply by k^2.2, which is what this curve gives.
+func srgbToLinear(c float32) float32 {
+	if c <= 0.04045 {
+		return c / 12.92
+	}
+	return float32(math.Pow(float64((c+0.055)/1.055), 2.4))
+}
+
+// emitSkinModulate controls whether a material layer's RGBA modulate is written as
+// baseColorFactor. Default off: see the comment at the call site. Set by --skin-modulate.
+var emitSkinModulate = false
+
+// SetSkinModulate enables emitting per-race skin modulate colours.
+func SetSkinModulate(on bool) { emitSkinModulate = on }

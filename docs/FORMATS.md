@@ -6,6 +6,33 @@ client (Ghidra + Emotion Engine loader) and validated against real disc data.
 Engine function references (`FUN_00xxxxxx`) are addresses in the Frontiers
 beta client executable and mark where each claim was verified.
 
+## Authoring provenance
+
+The formats below are the shipped form of assets authored in the standard DCC tools of the era:
+
+| Asset class | Authored in |
+|---|---|
+| Textures and 2D art | Photoshop |
+| Character animation | Maya |
+| Environment props | 3ds Max |
+
+This is not trivia. Several things in these formats read as export-pipeline artefacts rather than
+engine design, and knowing the source tool is often what makes a field make sense:
+
+- **Texture conventions follow the paint tool, not the GS.** Palette alpha is a full 0–255 range
+  with a mode of 255 — measured at 93.7% of `CHAR*` CLUT entries above 128 — not the PS2's 0–128
+  convention. That is what an 8-bit RGBA export produces, and the client compares it against
+  `AREF=128` at draw time. Assuming the hardware convention here led directly to a wrong
+  `alphaCutoff`; see `MATERIAL_BLEND_MODES.md`.
+- **Skeletons and animation carry Maya's structure.** The 0x2400 hierarchy stores world-space bind
+  TRS and the loader converts to parent-relative at load — a DCC-side export choice, not something
+  the runtime needs. Joint ordering and the separate upper/lower animation layers follow from how
+  the clips were authored.
+- **Props carry Max's.** GroupSprite member transforms are `T·R·S` with Euler angles rather than
+  quaternions, and zone actors carry full Euler triples where only yaw is usually non-zero.
+
+Where a field looks arbitrary, the exporting tool is often the explanation.
+
 ## CSF — compressed container
 
 Most disc files ship as CSF: a zlib block container around a raw ESF stream.

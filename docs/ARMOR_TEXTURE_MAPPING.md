@@ -88,7 +88,113 @@ Structural/heuristic labeling from charcust.csf surface order + dimensions + the
 enumeration of armor sets/slots. Usable but **not exact** — prior heuristic passes on
 this codebase have been wrong before, so treat as provisional only.
 
+## RESOLVED OFFLINE (2026-07-23) — the "blocked on live read" conclusion was wrong
+
+The tables *are* runtime-populated with dictionary **indices**, but that was the wrong
+thing to chase. `SetResources__13VICSpriteCust` @`0x004072b8` calls `FindTyped` ~140
+times with the texture **DictIDs hardcoded as immediates**, and eqonvert names exported
+textures **by DictID** — so the DictID→texture identity is fully recoverable from the
+binary, no emulator needed. Extracted + **100% resolved** to exported files:
+
+- **Face** table `0x4c6d18` (race×0x20 = 4 faces×2 genders): 10 races, **80/80** → Human/Elf
+  in `DATA/CHAR/`, others in `DATA2/CHARFACE/` (Erudite's are the dark ones).
+- **Hair** table `0x4c6e78` (8): **8/8** in `DATA/CHAR/`. Default per race = `hair[raceTable+0x40]`.
+- **Robe** `0x4c6e98` (8): 8/8. **ArmorSet body** `0x4c6c60` (8 sets × 5 slots): 40/40.
+- **Tint palette** `0x4afa08` (15 RGBA, hardcoded in `SetResources`): tint3 `(150,100,50)`
+  brown & tint11 `(220,190,150)` tan are the skin tones.
+
+Full spec: `eqoa-xr/tools/ui-loop/appearance_tables.json` (extractor
+`scratchpad/extract_appearance.py`). Frontiers race table (per-race default face/hair
+indices) read live from `slus_290.63_frontiers_beta_ee.bin` @`0x4EF4A0` (see CHAR_CREATION.md §1.8).
+
+**Still open:** `race → default-armorSet` — NOT in `SetResources` (the preview build
+`FUN_00653d00` sets only `SetHair`+`SetFace`, no skin-tint/armor). Trace the in-game default
+appearance path (`VICSprite::Init` / char-record apply) or read the applied values from the dump.
+
+`race → skin-tint index` was also open here; it is **answered below** — there is no such index,
+because there is no race→skin-tint table at all.
+
+## RESOLVED (2026-07-30): per-race skin colour is a baked material-layer modulate
+
+Answers the `race → skin-tint index` item left open by the 2026-07-23 section above. Established by
+static analysis of the retail SLUS char-creation snapshot (Ghidra `ghidra-support`) plus raw table
+reads from `slus_280.28_snapshot_data.elf`. Supersedes the "race → skin tint TODO" in
+`appearance_tables.json`.
+
+**There is no race→skin-texture lookup and no race→skin-tint table.** Each race's CSprite material
+palette in `char.esf` carries a per-layer RGBA modulate, applied by `ParseMaterial__10VIESFParse`
+(`0x0040c6d8`) at parse time via `SetLayerColor`. That colour is the skin tone.
+
+| race | modulate on the four shared flesh surfaces |
+|---|---|
+| Human, Elf, Halfling | `(255,255,255,255)` — neutral |
+| **Erudite M/F** | **`(109,83,77,255)`** |
+| Barbarian M | `(237,219,188,255)` |
+| Barbarian F | `(238,220,189,255)` |
+| DarkElf, Gnome, Dwarf, Troll | n/a — own texture sets, no shared flesh |
+
+Shared flesh surfaces: `d88fea71`, `b0379a45`, `75bf0eb0`, `058d23d3`.
+
+The Erudite ratio is `0.427 / 0.325 / 0.302`, against `0.45 / 0.36 / 0.19` measured independently
+from exported GLB texture means. R and G agree closely; B differs because the measurement came from
+*face* textures rather than the body modulate.
+
+### Why it is not the tint table
+
+`GetArmorSetTexture` (`0x00408410`) takes race in `a0` and **overwrites it before ever reading it**
+(`_li a0,0x14` on the `armorSet == 0` path), so CHARCUST body skins are indexed
+`[armorSet 1..8][slot 0..4]` only. Race is used in exactly one place: `SetFace` → `GetFaceTexture`
+(`0x00408458`), `faces[race][face][sex]` at `0x004c6d18`.
+
+The 15 tints at `DAT_004afa08` are dyes applied per armour slot, index 0 being white = no dye. There
+is no second tint table.
+
+Relevant to character creation specifically: the preview spawner `FUN_00653d00` calls only `SetHair`
+and `SetFace`, never `SetArmorSlot` — so on the create and customise screens the baked layer colour
+is exactly what the player sees. In world, `SetArmorSlot` overwrites the layer colour with the dye
+tint on body slots 0–4, so the baked skin tone survives only on slots armour never touches.
+
+### Material header layout (corrected)
+
+The client reads:
+
+```
+u32   numLayers
+u32   flags           (version > 1)
+RGBA  emissive        (version > 2)
+layer[numLayers]      68 bytes each
+```
+
+Layer: `flags u32 | textureDictID u32 | wrapMode u32 | blendMode u32 | RGBA | UV matrix 9f |
+lodBias f | UV rate 2f`.
+
+`ParseMaterialBody` previously read a DictID first whenever `version > 1`, shifting everything by
+four bytes on the v=3 materials characters use. `numLayers` then decoded as 0, the layer loop never
+ran, and the `numLayers == 0` fallback picked up what happened to be layer 0's texture ID — so
+single-texture lookup worked by accident while **every second layer, every layer colour, and all
+wrap/blend modes were silently discarded**. Fixed, with `pkg/eqoa/material_test.go` covering the
+two-layer v=3 case, neutral single-layer, an implausible layer count, and truncation.
+
+### The modulate is decoded but NOT emitted by default
+
+Emitting the layer colour as `baseColorFactor` was tried and reverted. It corrects Erudite bodies
+but regresses others — Gnome carries `(0.216, 0, 0)` and Ogre `(0.051, 0.041, 0.041)` on layers
+where a literal reading turns the model near-black. A chromatic-only filter was not enough. It is
+available behind `SetSkinModulate` / off by default; the regression was caught by
+`pkg/gltf/golden_test.go`.
+
+The suspected `2×` PS2 bias (Human carries `(128,128,128)` on one layer, which reads like "1.0"
+under that convention) is therefore still unverified, and remains the first thing to test if the
+modulate is ever turned back on.
+
+### Second-layer blend modes — decoded
+
+No longer open. All five blend modes and the wrap bitmask were read off their GS register encodings;
+see **`MATERIAL_BLEND_MODES.md`**. Briefly: mode 4 is a multiply pass that never reads the layer's
+RGB, mode 0 is an alpha test at `AREF=128`, and blend/wrap/dropped-layer data is now preserved per
+material in glTF `extras`.
+
 ## Related
 
 Memory: `project_armor_texture_swap`, `project_model_naming`, `project_client_game_logic`,
-`project_char_garment_alpha`, `project_char_dup_blank`.
+`project_char_garment_alpha`, `project_char_dup_blank`, `project_eqoa_ui_tools`.

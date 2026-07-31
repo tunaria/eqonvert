@@ -1,0 +1,1468 @@
+{
+ "CHAR_Barbarian_Female_animated_0xC44AD516.glb": {
+  "materials": [
+   {
+    "texture": "263577f7ab8d",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "3e709b6ed1f7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "3e709b6ed1f7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "71fbfc4eccc2",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "4f7683eea742",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "f56ceb3db166",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "c01b068aebbc",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "a37989d66e98",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "3e709b6ed1f7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "3e709b6ed1f7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "3e709b6ed1f7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "3e709b6ed1f7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   }
+  ],
+  "images": 12,
+  "meshes": 2
+ },
+ "CHAR_Barbarian_Male_animated_0x61CA3EDF.glb": {
+  "materials": [
+   {
+    "texture": "263577f7ab8d",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "3e709b6ed1f7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "3e709b6ed1f7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "3e709b6ed1f7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7424bd37e6b",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "71fbfc4eccc2",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "4f7683eea742",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "a37989d66e98",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "c01b068aebbc",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "bae41455b82f",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "3e709b6ed1f7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "3e709b6ed1f7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "3e709b6ed1f7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "3e709b6ed1f7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   }
+  ],
+  "images": 12,
+  "meshes": 2
+ },
+ "CHAR_DarkElf_Female_animated_0x8C9B4B39.glb": {
+  "materials": [
+   {
+    "texture": "b7424bd37e6b",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7c831921fa7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7c831921fa7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7c831921fa7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "8d851e94526d",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "21bcbaa7e18e",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "8d851e94526d",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7c831921fa7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7c831921fa7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "dd2ebd04badd",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "881b6ba2f726",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "db4f0aabb364",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "4dc0765e6bac",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "313da22e6342",
+    "alphaMode": "OPAQUE"
+   }
+  ],
+  "images": 11,
+  "meshes": 2
+ },
+ "CHAR_DarkElf_Male_animated_0x7ED89DAA.glb": {
+  "materials": [
+   {
+    "texture": "dd2ebd04badd",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "21bcbaa7e18e",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "4dc0765e6bac",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "881b6ba2f726",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "db4f0aabb364",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "5599b98d4bd5",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "b7424bd37e6b",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7424bd37e6b",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7424bd37e6b",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7424bd37e6b",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7424bd37e6b",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7424bd37e6b",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7424bd37e6b",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7424bd37e6b",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   }
+  ],
+  "images": 10,
+  "meshes": 2
+ },
+ "CHAR_Dwarf_Female_animated_0x350BFDBE.glb": {
+  "materials": [
+   {
+    "texture": "d038de6dde6e",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "9e1c9d546bf0",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "8d288cb0f1db",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "f4498a4372e9",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "39283781f3aa",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "71058fdf3084",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   }
+  ],
+  "images": 10,
+  "meshes": 2
+ },
+ "CHAR_Dwarf_Male_animated_0xAA5B0447.glb": {
+  "materials": [
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "9e1c9d546bf0",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "d038de6dde6e",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "f206bd20e872",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "f4498a4372e9",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "39283781f3aa",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "71058fdf3084",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   }
+  ],
+  "images": 10,
+  "meshes": 2
+ },
+ "CHAR_Elf_Female_animated_0xE18919F7.glb": {
+  "materials": [
+   {
+    "texture": "71fbfc4eccc2",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "263577f7ab8d",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "8d851e94526d",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "8d851e94526d",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "8d851e94526d",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "a37989d66e98",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "e65ec7e32156",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "4d4b9739fcf3",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "f49c5f4981d1",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "8d851e94526d",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7424bd37e6b",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "8d851e94526d",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   }
+  ],
+  "images": 12,
+  "meshes": 2
+ },
+ "CHAR_Elf_Male_animated_0xD8D56FF8.glb": {
+  "materials": [
+   {
+    "texture": "71fbfc4eccc2",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7424bd37e6b",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "263577f7ab8d",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7424bd37e6b",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7424bd37e6b",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7424bd37e6b",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7c831921fa7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "4d4b9739fcf3",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "a37989d66e98",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "e65ec7e32156",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "725601ee6508",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "b7424bd37e6b",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7424bd37e6b",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7424bd37e6b",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   }
+  ],
+  "images": 11,
+  "meshes": 2
+ },
+ "CHAR_Erudite_Female_animated_0x4F1A3CBE.glb": {
+  "materials": [
+   {
+    "texture": "263577f7ab8d",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "3e709b6ed1f7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "8d851e94526d",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "3e709b6ed1f7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "71fbfc4eccc2",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b29434f4e4d9",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "a37989d66e98",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "4c4dc0833fad",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "c01b068aebbc",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "c89f6a16fd43",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   }
+  ],
+  "images": 12,
+  "meshes": 2
+ },
+ "CHAR_Erudite_Male_animated_0x320C0B47.glb": {
+  "materials": [
+   {
+    "texture": "263577f7ab8d",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "8d851e94526d",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "8d851e94526d",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "71fbfc4eccc2",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "4c4dc0833fad",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "a37989d66e98",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "c01b068aebbc",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "6991fca4a0b2",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   }
+  ],
+  "images": 10,
+  "meshes": 2
+ },
+ "CHAR_Gnome_Female_animated_0x4C4084FC.glb": {
+  "materials": [
+   {
+    "texture": "b29434f4e4d9",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b29434f4e4d9",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "299ebfc42c50",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "b29434f4e4d9",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b29434f4e4d9",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "9e1c9d546bf0",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "d038de6dde6e",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "f4498a4372e9",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "39283781f3aa",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "486d26929f1c",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "b29434f4e4d9",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b29434f4e4d9",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b29434f4e4d9",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b29434f4e4d9",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   }
+  ],
+  "images": 11,
+  "meshes": 2
+ },
+ "CHAR_Gnome_Male_animated_0xA99C6B15.glb": {
+  "materials": [
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "9e1c9d546bf0",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "d038de6dde6e",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c7bd800c6f24",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "f4498a4372e9",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "39283781f3aa",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "486d26929f1c",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7c831921fa7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b7c831921fa7",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   }
+  ],
+  "images": 11,
+  "meshes": 2
+ },
+ "CHAR_Halfling_Female_animated_0x8A27A731.glb": {
+  "materials": [
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "9e1c9d546bf0",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "d038de6dde6e",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "9f9bb2a15166",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "f53d26550437",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "f4498a4372e9",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "39283781f3aa",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "f53d26550437",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   }
+  ],
+  "images": 10,
+  "meshes": 2
+ },
+ "CHAR_Halfling_Male_animated_0xA3DB3FE2.glb": {
+  "materials": [
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "9e1c9d546bf0",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "d038de6dde6e",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "462129c9b856",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "f4498a4372e9",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "39283781f3aa",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "f53d26550437",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "f53d26550437",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   }
+  ],
+  "images": 10,
+  "meshes": 2
+ },
+ "CHAR_Human_Female_animated_0xD537335.glb": {
+  "materials": [
+   {
+    "texture": "b29434f4e4d9",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b29434f4e4d9",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "263577f7ab8d",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "a37989d66e98",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "c01b068aebbc",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "eda1b939216e",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "9a41bfbd2808",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "71fbfc4eccc2",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "b29434f4e4d9",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   }
+  ],
+  "images": 11,
+  "meshes": 2
+ },
+ "CHAR_Human_Male_animated_0x70D898C6.glb": {
+  "materials": [
+   {
+    "texture": "263577f7ab8d",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "9a41bfbd2808",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "7e3a0def0446",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "c01b068aebbc",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "a37989d66e98",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "71fbfc4eccc2",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "8d851e94526d",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "8d851e94526d",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c75fb3efc744",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   }
+  ],
+  "images": 11,
+  "meshes": 2
+ },
+ "CHAR_Ogre_Female_animated_0xACC00B4F.glb": {
+  "materials": [
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "9e1c9d546bf0",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "d038de6dde6e",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "9ae0a437f3a3",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "c011099c027e",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "39283781f3aa",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "a293003df7c1",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "4b3967c4390f",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   }
+  ],
+  "images": 10,
+  "meshes": 2
+ },
+ "CHAR_Ogre_Male_animated_0x84807490.glb": {
+  "materials": [
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "9e1c9d546bf0",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "4b3967c4390f",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "456d8adf45a5",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "d038de6dde6e",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "c011099c027e",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "39283781f3aa",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "a293003df7c1",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   }
+  ],
+  "images": 10,
+  "meshes": 2
+ },
+ "CHAR_Troll_Female_animated_0x4DE32701.glb": {
+  "materials": [
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "cfbd2a8d1185",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "7ad6b76cd588",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "718083fd6170",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "5b22a8e8048b",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "e1a5b50c943c",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "a293003df7c1",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   }
+  ],
+  "images": 9,
+  "meshes": 2
+ },
+ "CHAR_Troll_Male_animated_0x4C6FA532.glb": {
+  "materials": [
+   {
+    "texture": "cfbd2a8d1185",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "718083fd6170",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "5b22a8e8048b",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "e1a5b50c943c",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "79832186be6d",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "a293003df7c1",
+    "alphaMode": "OPAQUE"
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   },
+   {
+    "texture": "92c295419781",
+    "alphaMode": "MASK",
+    "cutoff": 0.5
+   }
+  ],
+  "images": 9,
+  "meshes": 2
+ }
+}

@@ -17,6 +17,7 @@ type GLTF struct {
 	Buffers        []Buffer     `json:"buffers,omitempty"`
 	Materials      []Material   `json:"materials,omitempty"`
 	Textures       []Texture    `json:"textures,omitempty"`
+	Samplers       []Sampler    `json:"samplers,omitempty"`
 	Images         []Image      `json:"images,omitempty"`
 	Skins          []Skin       `json:"skins,omitempty"`
 	Animations     []Animation  `json:"animations,omitempty"`
@@ -174,7 +175,24 @@ type TextureInfo struct {
 
 type Texture struct {
 	Source int `json:"source"`
+	// Omitted for the REPEAT/REPEAT case, which is glTF's default when no sampler is given.
+	// Keeping it a pointer means the overwhelming majority of textures serialise exactly as
+	// they did before samplers existed.
+	Sampler *int `json:"sampler,omitempty"`
 }
+
+// Sampler carries texture wrapping. Filtering is deliberately left unset so viewers apply their
+// own defaults -- the PS2 filtering mode is a separate field that has not been decoded.
+type Sampler struct {
+	WrapS int `json:"wrapS"`
+	WrapT int `json:"wrapT"`
+}
+
+// glTF wrap constants (they are the OpenGL enum values).
+const (
+	WrapRepeat      = 10497
+	WrapClampToEdge = 33071
+)
 
 type Image struct {
 	BufferView int    `json:"bufferView"`

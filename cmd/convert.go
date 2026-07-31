@@ -38,6 +38,23 @@ var collisionExport bool
 // forceExport overrides the source-aware output-dir guard (see guardOutputDir).
 var forceExport bool
 
+// blendFromMaterial derives glTF alphaMode from the source material's blend mode rather than from
+// texture content. OFF by default: it is faithful to the hardware and worse to look at, because
+// glTF cannot carry the draw order those passes depend on. See gltf.SetBlendFromMaterial.
+var blendFromMaterial bool
+
+// gradientBlendBar is the TranslucentFraction above which a character/item MASK surface becomes
+// BLEND. See gltf.SetGradientBlendBar — 0.05 caught hair (which measures 0.052); now 0.10.
+var gradientBlendBar float64
+
+// maskCutoff is the glTF alphaCutoff for MASK materials. 0.999 matches the console's AREF=128
+// test; 0.5 was the previous value and filled cutout holes with opaque black.
+var maskCutoff float64
+
+// charMaskCutoff is the same threshold for character/item content, where the console value
+// shreds faces and hair. See gltf.SetCharMaskCutoff.
+var charMaskCutoff float64
+
 // manifestName is the marker file eqonvert writes into an output directory to
 // record which input it was populated from.
 const manifestName = ".eqonvert-manifest.json"
@@ -166,6 +183,10 @@ brew install ffmpeg libopenmpt`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
 		warnMissingTools()
+		gltf.SetBlendFromMaterial(blendFromMaterial)
+		gltf.SetGradientBlendBar(gradientBlendBar)
+		gltf.SetMaskCutoff(maskCutoff)
+		gltf.SetCharMaskCutoff(charMaskCutoff)
 		path := args[0]
 		info, err := os.Stat(path)
 		if err != nil {
@@ -843,6 +864,10 @@ func generateGLB(r io.ReadSeeker, asset *eqoa.Asset, order binary.ByteOrder, pre
 func init() {
 	convertCmd.Flags().StringVarP(&outputDir, "output", "o", "", "Output directory for GLB files (default: current directory)")
 	convertCmd.Flags().BoolVar(&forceExport, "force", false, "write into a non-empty or different-source output dir (overrides the export guard)")
+	convertCmd.Flags().BoolVar(&blendFromMaterial, "blend-from-material", false, "derive alphaMode from the source blend mode instead of texture content (off: faithful to the hardware but drops layered detail, since glTF cannot carry draw order)")
+	convertCmd.Flags().Float64Var(&gradientBlendBar, "gradient-blend-bar", 0.10, "TranslucentFraction above which a character/item MASK surface becomes BLEND (0.05 catches hair, which measures 0.052; ~0.10 leaves hair on MASK and keeps genuinely sheer cloth at 0.21+ on BLEND)")
+	convertCmd.Flags().Float64Var(&maskCutoff, "alpha-cutoff", 0.999, "glTF alphaCutoff for ZONE/environment MASK materials (0.5 is long-standing; 0.999 reproduces the console's AREF=128 alpha test, which draws noticeably less of some foliage)")
+	convertCmd.Flags().Float64Var(&charMaskCutoff, "char-alpha-cutoff", 0.5, "glTF alphaCutoff for CHARACTER/ITEM MASK materials (0.5; the console's 0.999 discards most of a face's alpha-masked detail overlay)")
 	convertCmd.Flags().BoolVar(&collisionExport, "collision", true, "export zone collision geometry (0x4200 CollBuffer) as a tagged 'collision' node (on by default; --collision=false to omit)")
 	convertCmd.Flags().BoolVar(&markSpawns, "mark-spawns", false, "place a built-in marker at unresolved spawn actors in assembled zones")
 	convertCmd.Flags().Float64Var(&spawnScale, "spawn-scale", 1.0, "size multiplier for spawn markers (world units; markers are small vs a zone)")

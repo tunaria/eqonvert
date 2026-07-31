@@ -289,7 +289,7 @@ func (za *ZoneAssembler) buildMaterials(r io.ReadSeeker, matArrs []*eqoa.ESFObje
 				},
 			}
 			if alphaMode == "MASK" {
-				cutoff := float32(0.5)
+				cutoff := maskCutoff
 				gm.AlphaCutoff = &cutoff
 			}
 			if len(m.Layers) > 0 {

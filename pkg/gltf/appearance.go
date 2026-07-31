@@ -80,12 +80,39 @@ func (a *AppearanceSpec) Mapping() AppearanceMapping {
 	return m
 }
 
-// matExtras is the per-material extras payload written when appearance is applied.
+// matExtras is the per-material extras payload.
+//
+// It exists because glTF cannot express everything an EQOA material says, and the parts it
+// cannot express were previously just lost. A material carries a blend mode drawn from a
+// five-value enum, a wrap mask, and up to sixteen texture layers; glTF has alphaMode, a
+// sampler, and one base-colour texture. Rather than silently discard the remainder, every
+// material records what the source actually stated, so a downstream consumer can reproduce
+// effects this exporter cannot -- and so the loss is auditable instead of invisible.
+//
+// See docs/MATERIAL_BLEND_MODES.md for the decoded meaning of each value.
 type matExtras struct {
-	MatIndex  int  `json:"eqoaMatIndex"`  // palette order index
-	SlotGuess int  `json:"eqoaSlotGuess"` // provisional body slot 0..4
+	// Source facts, written for every material.
+	BlendMode   int          `json:"eqoaBlendMode"`
+	WrapMode    int          `json:"eqoaWrapMode"`
+	LayerCount  int          `json:"eqoaLayerCount"`
+	ExtraLayers []extraLayer `json:"eqoaExtraLayers,omitempty"`
+
+	// Appearance, written only under --apply-appearance. Pointers because slot 0 and material
+	// index 0 are both meaningful, so omitempty on a plain int would erase a real value.
+	MatIndex  *int `json:"eqoaMatIndex,omitempty"`  // palette order index
+	SlotGuess *int `json:"eqoaSlotGuess,omitempty"` // provisional body slot 0..4
 	HairSlot  bool `json:"eqoaHairSlot,omitempty"`
 	Bare      bool `json:"eqoaBareSkin,omitempty"` // received the skin tint
+}
+
+// extraLayer records a layer beyond the first -- the ones glTF has nowhere to put. Their
+// textures are already embedded in the GLB (they are referenced by the surface table), so this
+// costs only the descriptor and makes otherwise-unreachable artwork addressable.
+type extraLayer struct {
+	TexID     string     `json:"texId"`
+	BlendMode int        `json:"blendMode"`
+	WrapMode  int        `json:"wrapMode"`
+	Color     [4]float32 `json:"color"`
 }
 
 func mustJSON(v interface{}) json.RawMessage {
