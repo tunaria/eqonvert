@@ -92,9 +92,15 @@ func (a *AppearanceSpec) Mapping() AppearanceMapping {
 // See docs/MATERIAL_BLEND_MODES.md for the decoded meaning of each value.
 type matExtras struct {
 	// Source facts, written for every material.
-	BlendMode   int          `json:"eqoaBlendMode"`
-	WrapMode    int          `json:"eqoaWrapMode"`
-	LayerCount  int          `json:"eqoaLayerCount"`
+	BlendMode  int `json:"eqoaBlendMode"`
+	WrapMode   int `json:"eqoaWrapMode"`
+	LayerCount int `json:"eqoaLayerCount"`
+	// LayerColor is layer 0's RGBA modulate, 0-255. This is the per-race skin tone: the flesh
+	// textures are shared, and the palette carries the colour (Erudite 109,83,77; Barbarian
+	// 237,219,188; Human neutral). It is recorded but NOT applied as baseColorFactor -- doing so
+	// regressed Gnome and Ogre, see emitSkinModulate -- so a downstream consumer that wants to
+	// experiment with it needs the number, and previously had nowhere to get it.
+	LayerColor  [4]float32   `json:"eqoaLayerColor"`
 	ExtraLayers []extraLayer `json:"eqoaExtraLayers,omitempty"`
 
 	// Appearance, written only under --apply-appearance. Pointers because slot 0 and material

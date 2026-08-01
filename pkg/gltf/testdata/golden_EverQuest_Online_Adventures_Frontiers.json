@@ -2,7 +2,7 @@
  "CHAR_Barbarian_Female_animated_0xC44AD516.glb": {
   "materials": [
    {
-    "texture": "263577f7ab8d",
+    "texture": "3ffc187ba4a4",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -22,7 +22,7 @@
     "cutoff": 0.5
    },
    {
-    "texture": "71fbfc4eccc2",
+    "texture": "b28c50ea5cc6",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -35,11 +35,11 @@
     "alphaMode": "OPAQUE"
    },
    {
-    "texture": "c01b068aebbc",
+    "texture": "a3c6b2339acd",
     "alphaMode": "OPAQUE"
    },
    {
-    "texture": "a37989d66e98",
+    "texture": "bf28da1dceb6",
     "alphaMode": "OPAQUE"
    },
    {
@@ -68,13 +68,13 @@
     "cutoff": 0.5
    }
   ],
-  "images": 12,
+  "images": 16,
   "meshes": 2
  },
  "CHAR_Barbarian_Male_animated_0x61CA3EDF.glb": {
   "materials": [
    {
-    "texture": "263577f7ab8d",
+    "texture": "e6da389805c6",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -99,7 +99,7 @@
     "cutoff": 0.5
    },
    {
-    "texture": "71fbfc4eccc2",
+    "texture": "8a30c89fba96",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -108,11 +108,11 @@
     "alphaMode": "OPAQUE"
    },
    {
-    "texture": "a37989d66e98",
+    "texture": "113ef93c49eb",
     "alphaMode": "OPAQUE"
    },
    {
-    "texture": "c01b068aebbc",
+    "texture": "973973031129",
     "alphaMode": "OPAQUE"
    },
    {
@@ -140,7 +140,7 @@
     "cutoff": 0.5
    }
   ],
-  "images": 12,
+  "images": 16,
   "meshes": 2
  },
  "CHAR_DarkElf_Female_animated_0x8C9B4B39.glb": {
@@ -316,27 +316,27 @@
     "alphaMode": "OPAQUE"
    },
    {
-    "texture": "92c295419781",
+    "texture": "fd04d40337be",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "92c295419781",
+    "texture": "fd04d40337be",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "92c295419781",
+    "texture": "fd04d40337be",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "92c295419781",
+    "texture": "fd04d40337be",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "92c295419781",
+    "texture": "97ac7777e0e6",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -356,18 +356,18 @@
     "cutoff": 0.5
    }
   ],
-  "images": 10,
+  "images": 13,
   "meshes": 2
  },
  "CHAR_Dwarf_Male_animated_0xAA5B0447.glb": {
   "materials": [
    {
-    "texture": "92c295419781",
+    "texture": "97ac7777e0e6",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "92c295419781",
+    "texture": "97ac7777e0e6",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -403,17 +403,17 @@
     "cutoff": 0.5
    },
    {
-    "texture": "92c295419781",
+    "texture": "97ac7777e0e6",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "92c295419781",
+    "texture": "97ac7777e0e6",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "92c295419781",
+    "texture": "168a84ad6d17",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -428,7 +428,7 @@
     "cutoff": 0.5
    }
   ],
-  "images": 10,
+  "images": 13,
   "meshes": 2
  },
  "CHAR_Elf_Female_animated_0xE18919F7.glb": {
@@ -578,37 +578,37 @@
  "CHAR_Erudite_Female_animated_0x4F1A3CBE.glb": {
   "materials": [
    {
-    "texture": "263577f7ab8d",
+    "texture": "dfa16b8cddc3",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "3e709b6ed1f7",
+    "texture": "8994e24d7eba",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "8d851e94526d",
+    "texture": "6c951bf61102",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "3e709b6ed1f7",
+    "texture": "8994e24d7eba",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "71fbfc4eccc2",
+    "texture": "e1d9ca5a7094",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "b29434f4e4d9",
+    "texture": "efe7c43b40d5",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "a37989d66e98",
+    "texture": "80a84f545335",
     "alphaMode": "OPAQUE"
    },
    {
@@ -616,7 +616,7 @@
     "alphaMode": "OPAQUE"
    },
    {
-    "texture": "c01b068aebbc",
+    "texture": "74712ce6e42b",
     "alphaMode": "OPAQUE"
    },
    {
@@ -644,13 +644,13 @@
     "cutoff": 0.5
    }
   ],
-  "images": 12,
+  "images": 20,
   "meshes": 2
  },
  "CHAR_Erudite_Male_animated_0x320C0B47.glb": {
   "materials": [
    {
-    "texture": "263577f7ab8d",
+    "texture": "dfa16b8cddc3",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -670,17 +670,17 @@
     "cutoff": 0.5
    },
    {
-    "texture": "8d851e94526d",
+    "texture": "6c951bf61102",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "8d851e94526d",
+    "texture": "6c951bf61102",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "71fbfc4eccc2",
+    "texture": "e1d9ca5a7094",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -689,11 +689,11 @@
     "alphaMode": "OPAQUE"
    },
    {
-    "texture": "a37989d66e98",
+    "texture": "80a84f545335",
     "alphaMode": "OPAQUE"
    },
    {
-    "texture": "c01b068aebbc",
+    "texture": "74712ce6e42b",
     "alphaMode": "OPAQUE"
    },
    {
@@ -716,7 +716,7 @@
     "cutoff": 0.5
    }
   ],
-  "images": 10,
+  "images": 16,
   "meshes": 2
  },
  "CHAR_Gnome_Female_animated_0x4C4084FC.glb": {
@@ -736,12 +736,12 @@
     "alphaMode": "OPAQUE"
    },
    {
-    "texture": "b29434f4e4d9",
+    "texture": "3e89026f78de",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "b29434f4e4d9",
+    "texture": "b6f8ad3974e5",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -768,7 +768,7 @@
     "alphaMode": "OPAQUE"
    },
    {
-    "texture": "b29434f4e4d9",
+    "texture": "3e89026f78de",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -778,7 +778,7 @@
     "cutoff": 0.5
    },
    {
-    "texture": "b29434f4e4d9",
+    "texture": "e2012ec2f83b",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -788,17 +788,17 @@
     "cutoff": 0.5
    },
    {
-    "texture": "92c295419781",
+    "texture": "6c94ef1282c0",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "b29434f4e4d9",
+    "texture": "652f82bc5d2a",
     "alphaMode": "MASK",
     "cutoff": 0.5
    }
   ],
-  "images": 11,
+  "images": 17,
   "meshes": 2
  },
  "CHAR_Gnome_Male_animated_0xA99C6B15.glb": {
@@ -850,7 +850,7 @@
     "cutoff": 0.5
    },
    {
-    "texture": "92c295419781",
+    "texture": "800db618ac0f",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -870,7 +870,7 @@
     "cutoff": 0.5
    }
   ],
-  "images": 11,
+  "images": 13,
   "meshes": 2
  },
  "CHAR_Halfling_Female_animated_0x8A27A731.glb": {
@@ -1094,7 +1094,7 @@
     "cutoff": 0.5
    }
   ],
-  "images": 11,
+  "images": 12,
   "meshes": 2
  },
  "CHAR_Human_Male_animated_0x70D898C6.glb": {
@@ -1166,13 +1166,13 @@
     "cutoff": 0.5
    }
   ],
-  "images": 11,
+  "images": 12,
   "meshes": 2
  },
  "CHAR_Ogre_Female_animated_0xACC00B4F.glb": {
   "materials": [
    {
-    "texture": "92c295419781",
+    "texture": "97ac7777e0e6",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -1182,7 +1182,7 @@
     "cutoff": 0.5
    },
    {
-    "texture": "92c295419781",
+    "texture": "d6c75d2c6e9c",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -1212,22 +1212,22 @@
     "alphaMode": "OPAQUE"
    },
    {
-    "texture": "92c295419781",
+    "texture": "fd04d40337be",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "92c295419781",
+    "texture": "fd04d40337be",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "92c295419781",
+    "texture": "fd04d40337be",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "92c295419781",
+    "texture": "fd04d40337be",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -1242,7 +1242,7 @@
     "cutoff": 0.5
    }
   ],
-  "images": 10,
+  "images": 13,
   "meshes": 2
  },
  "CHAR_Ogre_Male_animated_0x84807490.glb": {
@@ -1298,7 +1298,7 @@
     "cutoff": 0.5
    },
    {
-    "texture": "92c295419781",
+    "texture": "03dcd1a8d022",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -1318,13 +1318,13 @@
     "cutoff": 0.5
    }
   ],
-  "images": 10,
+  "images": 11,
   "meshes": 2
  },
  "CHAR_Troll_Female_animated_0x4DE32701.glb": {
   "materials": [
    {
-    "texture": "92c295419781",
+    "texture": "97ac7777e0e6",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -1355,17 +1355,17 @@
     "alphaMode": "OPAQUE"
    },
    {
-    "texture": "92c295419781",
+    "texture": "fd04d40337be",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "92c295419781",
+    "texture": "fd04d40337be",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "92c295419781",
+    "texture": "fd04d40337be",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -1390,7 +1390,7 @@
     "cutoff": 0.5
    }
   ],
-  "images": 9,
+  "images": 11,
   "meshes": 2
  },
  "CHAR_Troll_Male_animated_0x4C6FA532.glb": {
@@ -1401,7 +1401,7 @@
     "cutoff": 0.5
    },
    {
-    "texture": "92c295419781",
+    "texture": "97ac7777e0e6",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -1411,17 +1411,17 @@
     "cutoff": 0.5
    },
    {
-    "texture": "92c295419781",
+    "texture": "fd04d40337be",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "92c295419781",
+    "texture": "fd04d40337be",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
    {
-    "texture": "92c295419781",
+    "texture": "fd04d40337be",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -1447,7 +1447,7 @@
     "alphaMode": "OPAQUE"
    },
    {
-    "texture": "92c295419781",
+    "texture": "029d7a114a95",
     "alphaMode": "MASK",
     "cutoff": 0.5
    },
@@ -1462,7 +1462,7 @@
     "cutoff": 0.5
    }
   ],
-  "images": 9,
+  "images": 12,
   "meshes": 2
  }
 }

@@ -5,6 +5,8 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"image"
+	"image/color"
 	"image/png"
 	"io"
 	"math"
@@ -292,6 +294,9 @@ func ExportAssetToBuilderWithAppearance(b *Builder, r io.ReadSeeker, asset *eqoa
 
 	surfaceToIndex := make(map[uint32]int)
 	surfaceAlphaMode := make(map[uint32]string)
+	// Decoded surfaces are kept so a per-race tint can be baked into a copy. The tint is only
+	// known at material time, by which point the surface has already been embedded.
+	surfaceImages := make(map[uint32]image.Image)
 	materialToIndex := make(map[int]int)
 	materialHasTexture := make(map[int]bool)
 
@@ -393,6 +398,7 @@ func ExportAssetToBuilderWithAppearance(b *Builder, r io.ReadSeeker, asset *eqoa
 						b.Doc.Textures = append(b.Doc.Textures, Texture{Source: imgIdx})
 						surfaceToIndex[s.DictID] = texIdx
 						surfaceAlphaMode[s.DictID] = alphaModeFor(s, blendGradients)
+						surfaceImages[s.DictID] = img
 					}
 				}
 			}
@@ -424,6 +430,73 @@ func ExportAssetToBuilderWithAppearance(b *Builder, r io.ReadSeeker, asset *eqoa
 			b.Doc.Textures = append(b.Doc.Textures, Texture{Source: imgIdx})
 			surfaceToIndex[dictID] = texIdx
 			surfaceAlphaMode[dictID] = alphaModeFor(surf, blendGradients)
+			surfaceImages[dictID] = img
+		}
+
+		// Bake a material's layer-0 modulate into a copy of its texture.
+		//
+		// The flesh art is shared: three body textures are used by Human, Elf, Erudite and
+		// Barbarian alike, with the per-race skin tone carried in the palette as a modulate
+		// (Human and Elf neutral, Erudite 109,83,77, Barbarian 237,219,188). Without applying it
+		// the Erudite gets a dark head from its own CHARFACE texture and a pale body from the
+		// shared flesh, which is the visible bug.
+		//
+		// Baking rather than emitting baseColorFactor is also the more faithful operation. The
+		// console multiplies texel by modulate in GAMMA space; glTF's baseColorFactor multiplies
+		// in LINEAR space, which is why that route needed a c^2.2 correction and still read wrong.
+		// A per-texel multiply here is exactly what the hardware does.
+		//
+		// Keyed by surface AND modulate, so two races sharing a texture at the same tone share
+		// one baked copy, and a race using it neutral keeps the original.
+		tintCache := make(map[[2]uint64]int)
+		tintedTexture := func(dictID uint32, mod [4]float32) (int, bool) {
+			base, ok := surfaceToIndex[dictID]
+			if !ok {
+				return 0, false
+			}
+			r8 := uint32(mod[0]*255 + 0.5)
+			g8 := uint32(mod[1]*255 + 0.5)
+			b8 := uint32(mod[2]*255 + 0.5)
+			if r8 >= 255 && g8 >= 255 && b8 >= 255 {
+				return base, true // neutral: the shared texture is already correct
+			}
+			key := [2]uint64{uint64(dictID), uint64(r8)<<16 | uint64(g8)<<8 | uint64(b8)}
+			if idx, hit := tintCache[key]; hit {
+				return idx, true
+			}
+			src, ok := surfaceImages[dictID]
+			if !ok {
+				return base, true
+			}
+			bnds := src.Bounds()
+			dst := image.NewNRGBA(bnds)
+			for y := bnds.Min.Y; y < bnds.Max.Y; y++ {
+				for x := bnds.Min.X; x < bnds.Max.X; x++ {
+					cr, cg, cb, ca := src.At(x, y).RGBA() // 16-bit, alpha-premultiplied
+					a8 := uint8(ca >> 8)
+					un := func(v uint32) uint32 { // undo premultiplication
+						if ca == 0 {
+							return 0
+						}
+						return v * 0xffff / ca
+					}
+					mul := func(v, m uint32) uint8 {
+						return uint8(min(255, (un(v)>>8)*m/255))
+					}
+					dst.Set(x, y, color.NRGBA{mul(cr, r8), mul(cg, g8), mul(cb, b8), a8})
+				}
+			}
+			buf := new(bytes.Buffer)
+			if png.Encode(buf, dst) != nil {
+				return base, true
+			}
+			bvIdx := b.AddBufferView(buf.Bytes(), 0)
+			imgIdx := len(b.Doc.Images)
+			b.Doc.Images = append(b.Doc.Images, Image{BufferView: bvIdx, MimeType: "image/png"})
+			idx := len(b.Doc.Textures)
+			b.Doc.Textures = append(b.Doc.Textures, Texture{Source: imgIdx})
+			tintCache[key] = idx
+			return idx, true
 		}
 
 		// Opt-in CHARCUST appearance: pre-embed the chosen armor-slot and hair
@@ -468,6 +541,9 @@ func ExportAssetToBuilderWithAppearance(b *Builder, r io.ReadSeeker, asset *eqoa
 					if len(m.Layers) > 0 {
 						ex.BlendMode = int(m.Layers[0].BlendMode)
 						ex.WrapMode = int(m.Layers[0].WrapMode)
+						// Layer 0's modulate, 0-255: the per-race skin tone. Recorded, not applied.
+						c0 := m.Layers[0].Color
+						ex.LayerColor = [4]float32{c0[0] * 255, c0[1] * 255, c0[2] * 255, c0[3] * 255}
 						for _, l := range m.Layers[1:] {
 							ex.ExtraLayers = append(ex.ExtraLayers, extraLayer{
 								TexID:     fmt.Sprintf("0x%X", l.TexID),
@@ -499,6 +575,12 @@ func ExportAssetToBuilderWithAppearance(b *Builder, r io.ReadSeeker, asset *eqoa
 					}
 					if len(m.Layers) > 0 {
 						if texIdx, ok := textureFor(m.Layers[0].TexID, m.Layers[0].WrapMode); ok {
+							// Bake the per-race skin tone into a copy of the shared flesh texture.
+							if bakeSkinTint {
+								if ti, ok2 := tintedTexture(m.Layers[0].TexID, m.Layers[0].Color); ok2 {
+									texIdx = ti
+								}
+							}
 							gm.PBRMetallicRoughness.BaseColorTexture = &TextureInfo{Index: texIdx}
 							hasTexture = true
 						}
@@ -1046,6 +1128,24 @@ func srgbToLinear(c float32) float32 {
 // emitSkinModulate controls whether a material layer's RGBA modulate is written as
 // baseColorFactor. Default off: see the comment at the call site. Set by --skin-modulate.
 var emitSkinModulate = false
+
+// bakeSkinTint multiplies a material's layer-0 modulate into a COPY of its texture, rather than
+// emitting it as baseColorFactor.
+//
+// This is the per-race skin tone. Three body textures are shared by Human, Elf, Erudite and
+// Barbarian, with the tone carried in the palette -- so without it the Erudite has a dark head
+// (its own CHARFACE texture) and a pale body (shared neutral flesh).
+//
+// Preferred over emitSkinModulate because it matches the hardware: the console multiplies texel
+// by modulate in gamma space, while baseColorFactor multiplies in linear space -- which is why
+// that route needed a c^2.2 correction and still looked wrong. It also leaves material.color at
+// white, so nothing interacts with scene lighting or shows as a sheen.
+//
+// Costs one extra embedded image per (surface, tone) pair actually used.
+var bakeSkinTint = true
+
+// SetBakeSkinTint toggles baking the layer-0 modulate into a texture copy. See bakeSkinTint.
+func SetBakeSkinTint(on bool) { bakeSkinTint = on }
 
 // SetSkinModulate enables emitting per-race skin modulate colours.
 func SetSkinModulate(on bool) { emitSkinModulate = on }

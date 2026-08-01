@@ -175,17 +175,50 @@ single-texture lookup worked by accident while **every second layer, every layer
 wrap/blend modes were silently discarded**. Fixed, with `pkg/eqoa/material_test.go` covering the
 two-layer v=3 case, neutral single-layer, an implausible layer count, and truncation.
 
-### The modulate is decoded but NOT emitted by default
+### RESOLVED (2026-08-01): the modulate is baked into a texture copy
 
-Emitting the layer colour as `baseColorFactor` was tried and reverted. It corrects Erudite bodies
-but regresses others — Gnome carries `(0.216, 0, 0)` and Ogre `(0.051, 0.041, 0.041)` on layers
-where a literal reading turns the model near-black. A chromatic-only filter was not enough. It is
-available behind `SetSkinModulate` / off by default; the regression was caught by
-`pkg/gltf/golden_test.go`.
+**The problem was the colour space, not the value.** `baseColorFactor` multiplies in **linear**
+space; the console multiplies texel by modulate in **gamma** space. Two attempts at emitting the
+modulate as `baseColorFactor` failed on that mismatch — the first needed a `c^2.2` correction and
+still read wrong, and both turned Gnome `(0.216, 0, 0)` and Ogre `(0.051, 0.041, 0.041)`
+near-black. A non-white `material.color` also interacts with scene lighting, which showed as a
+plastic sheen over the skin.
 
-The suspected `2×` PS2 bias (Human carries `(128,128,128)` on one layer, which reads like "1.0"
-under that convention) is therefore still unverified, and remains the first thing to test if the
-modulate is ever turned back on.
+The exporter now multiplies the modulate into a **copy of the texture** (`bakeSkinTint`, on by
+default, `--bake-skin-tint`). A per-texel multiply in image space is exactly what the hardware
+does. `material.color` stays white, so nothing touches lighting and there is no sheen.
+
+Keyed by `(surface, tone)`, so races sharing a texture at the same tone share one baked copy and a
+race using it neutral keeps the original. Frontiers Erudite gains six images; Elf gains none.
+
+The premise was verified by hashing texture content across the ten male models rather than trusting
+the note above. Three body textures are shared by exactly Human, Elf, Erudite and Barbarian:
+
+| race | modulate on the shared flesh textures |
+|---|---|
+| Human, Elf | `(255,255,255)` — neutral, uses the art as-is |
+| Erudite | `(109,83,77)` |
+| Barbarian | `(237,219,188)` |
+
+**The suspected `2×` bias does not exist.** Neither `/255` nor `/128` looked right when tested
+interactively, because the divisor was never the variable — the colour space was. Human's
+`(128,128,128)` is simply a half-brightness modulate, not a unity value under a biased convention.
+
+**The extreme modulates were never skin.** Gnome's `(36,36,36)` and `(128,0,1)` land on its cap and
+beard; Dwarf's `(0,0,0)` lands on a non-skin material. Baking them is correct and visually verified
+— those races render normally. They only blackened under `baseColorFactor` because the linear-space
+multiply was wrong, not because the values were.
+
+`SetSkinModulate` / `--skin-modulate` remains as the old `baseColorFactor` path, still off, kept
+only for comparison.
+
+Measured effect on the golden baselines: 55 character materials changed texture on Frontiers, 82 on
+the base game, across 14 models — Barbarian, Dwarf, Erudite and Gnome — with **no** change to
+`alphaMode`, `alphaCutoff` or `baseColorFactor`. That is the signature of the bake and nothing else.
+
+The interactive tool used to settle this is `eqoa-xr/charcreate.html?tint=1`: an eyedropper that
+samples the rendered face and applies a normalised tint to the body, reporting the effective
+multiplier. It is what showed that no divisor of the stored value would work.
 
 ### Second-layer blend modes — decoded
 
