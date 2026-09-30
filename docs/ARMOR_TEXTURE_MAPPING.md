@@ -229,5 +229,16 @@ material in glTF `extras`.
 
 ## Related
 
+**Runtime in-memory layout: `CLIENT_MEMORY_STRUCTURES.md`** (2026-09-10) — the live VICSprite appearance-region
+offsets (armor slots @ +0xf38+slot*0x18, face +0xfe4, hair +0x1100, matPal +0x1a0, race +0x198), the
+appearance-manager slot the server ObjectUpdate fills, plus actor/scene/player/animation structures. It joins
+to THIS doc at the appearance slot: the runtime slot holds the armorSet/tint/face/hair indices; this doc
+resolves those to texture DictIDs. Independent 2026-09-10 re-derivation of the getters
+(GetArmorSetTexture 0x408410 race-dead, GetFaceTexture 0x408458, GetHairTexture 0x408440, GetRobeTexture
+0x408480, GetHelm 0x4084d0, GetTintColor 0x4084e8, SetResources 0x4072b8; NOTE the "Confirmed mechanism"
+symtab table above is the OLD skewed set — these Ghidra addrs are correct) + a 145-entry hash decoder
+(elfconv/tools/charcust_texture_map.py) CONFIRMED this doc's map (armor 8x5, face 10x4x2, hair 8+default,
+robe 4x2, helm 8).
+
 Memory: `project_armor_texture_swap`, `project_model_naming`, `project_client_game_logic`,
 `project_char_garment_alpha`, `project_char_dup_blank`, `project_eqoa_ui_tools`.
