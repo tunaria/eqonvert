@@ -211,6 +211,12 @@ func ExportAssetToBuilder(b *Builder, r io.ReadSeeker, asset *eqoa.Asset, order 
 // overridden. See AppearanceSpec for the (heuristic) slot model.
 func ExportAssetToBuilderWithAppearance(b *Builder, r io.ReadSeeker, asset *eqoa.Asset, order binary.ByteOrder, registry *eqoa.SurfaceRegistry, blendGradients bool, appearance *AppearanceSpec) (int, error) {
 	rootNodeIdx := b.AddNode(Node{Name: fmt.Sprintf("Sprite_0x%X", asset.ID)})
+	// The CSprite's 0x2710 size factor scales the whole sprite. The root node is
+	// the parent of the skeleton's root joints and of the rigid meshes, so
+	// joints, root motion and skinned vertices all scale with it.
+	if sf := asset.SizeFactor; sf > 0 && sf != 1 {
+		b.Doc.Nodes[rootNodeIdx].Scale = []float32{sf, sf, sf}
+	}
 
 	// Add Skeleton
 	var jointNodeIndices []int

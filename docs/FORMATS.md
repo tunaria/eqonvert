@@ -239,7 +239,7 @@ Decoded from the bytes of both discs and checked on every CSprite (855
 Frontiers, 419 vanilla: CHAR, CHARSEL, DEBUG and the Frontiers zone files).
 Parsers are in `pkg/eqoa/csprite.go` (`ReadCSpriteRecords`). A field gets a
 name only when the data proves it; the rest are `UnknownN`, N being the byte
-offset. Nothing here changes the export yet.
+offset. Of these, only the 0x2710 SizeFactor changes the export.
 
 **Child list by version.** Fixed per version on both discs:
 
@@ -249,6 +249,19 @@ offset. Nothing here changes the export yet.
 | v5 | 2710 1110 5000 B070 2800 2610 2400 5000 2450 2900 2910 2915 2920 2930 | one sprite in CHAR |
 | v6 | v5 + 2940 | CHAR, CHARSEL (vanilla) |
 | v7 | v6 + 2950 2960 | CHAR, CHARSEL, zone files (Frontiers only) |
+
+**0x2710 v4** (48 bytes, `ParseCSpriteHeader`): `u32 ID` (the CSprite id; the
+0x2700 has no body), `6 × f32 Unknown4`, `u32 Unknown28` (0..3), `f32
+SizeFactor` at +32, `u32 Unknown36/40/44` (small integers). SizeFactor is a
+uniform size factor: sprites that share one skeleton and the same converted
+geometry differ in all six Unknown4 floats by their SizeFactor ratio (18
+pairs, within 1%, measured with the tunaria JS port; leopards
+0x125E78F0..F3: 0.6 / 0.8 / 1.0 / 1.2; alligators 0x3E0EBFE1 0.8 and
+0x88806543 0.5). The Unknown4 floats follow a box min/max pattern but are
+several times wider than the mesh. The export applies SizeFactor as the scale
+of the `Sprite_0x...` root node, the parent of the skeleton's root joints; a
+zone actor multiplies it into its own scale. Whether the engine scales the
+skeleton, the mesh or both is not measured.
 
 **0x2900** (12 bytes): `u32 Unknown0` (always 1), `u32 MeshID`, `u32 Unknown8`
 (always 0). MeshID equals the dword at the sibling 0x2800 raw +24, which is the

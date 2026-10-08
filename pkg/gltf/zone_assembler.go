@@ -756,7 +756,13 @@ func (za *ZoneAssembler) AddAnimatedSpriteNode(r io.ReadSeeker, asset *eqoa.Asse
 	n.Matrix = nil
 	n.Translation = []float32{pos[0], pos[1], pos[2]}
 	n.Rotation = mat3ToQuat(EulerRotMatrix(rot))
-	n.Scale = []float32{scale, scale, scale}
+	// The sprite's own size factor (set on this node by the export) is kept
+	// under the actor's scale.
+	k := scale
+	if asset.SizeFactor > 0 {
+		k = scale * asset.SizeFactor
+	}
+	n.Scale = []float32{k, k, k}
 	za.b.AddSceneNode(rootIdx)
 
 	// Extend the zone bbox by the actor position (the sprite is small vs a zone).
