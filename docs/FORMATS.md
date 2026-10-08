@@ -126,8 +126,13 @@ A "sprite" is any renderable entity. Character models are usually a
 ├── 0x2400 HSpriteHierarchy     (skeleton)
 ├── 0x5000 RefMap               (bone map — immediately AFTER the hierarchy)
 ├── 0x2450 HSpriteTriggers, misc
-└── 0x2920 CSpriteASlotList     (attach slots — where held items go)
+├── 0x2900 … 0x2915             (mesh id, animation table, slot table)
+├── 0x2920 CSpriteASlotList     (attach slots — where held items go)
+└── 0x2930 … 0x2960             (v6/v7 additions, particle effects)
 ```
+
+The exact list depends on the CSprite's version; see
+[CSprite records](#csprite-records).
 
 ⚠️ Sprites carry **multiple 0x5000 RefMaps** with different meanings. The
 bone map is specifically the one following the 0x2400 hierarchy in the same
@@ -227,6 +232,78 @@ The same node identity is in the GLB itself three ways: the joint's
 `Joint_<node_index>` name, the skin's `joints` array (index-aligned with the
 0x2400 hierarchy, so `skin.joints[node_index]` is the node), and each joint
 node's `extras.node_index`.
+
+## CSprite records
+
+Decoded from the bytes of both discs and checked on every CSprite (855
+Frontiers, 419 vanilla: CHAR, CHARSEL, DEBUG and the Frontiers zone files).
+Parsers are in `pkg/eqoa/csprite.go` (`ReadCSpriteRecords`). A field gets a
+name only when the data proves it; the rest are `UnknownN`, N being the byte
+offset. Nothing here changes the export yet.
+
+**Child list by version.** Fixed per version on both discs:
+
+| Version | Children, in order | Where |
+|---|---|---|
+| v3 | 2710 1110 5000 2800 2610 2400 5000 2900 2910 2915 2920 | DEBUG only |
+| v5 | 2710 1110 5000 B070 2800 2610 2400 5000 2450 2900 2910 2915 2920 2930 | one sprite in CHAR |
+| v6 | v5 + 2940 | CHAR, CHARSEL (vanilla) |
+| v7 | v6 + 2950 2960 | CHAR, CHARSEL, zone files (Frontiers only) |
+
+**0x2900** (12 bytes): `u32 Unknown0` (always 1), `u32 MeshID`, `u32 Unknown8`
+(always 0). MeshID equals the dword at the sibling 0x2800 raw +24, which is the
+first body dword of the one grandchild under 0x2800: a 0x2321 (2800 > 2320 >
+2321) or a 0x2A50 (2800 > 2A40 > 2A50).
+
+**0x2910 v3** animation table: `u32 count`, then 44-byte records:
+
+```
++0  u32 ActionID   a 0x2600 dictID in the same sprite's 0x2610
++4  u32 Action2ID  0, or the 0x2600 right after ActionID in 0x2610 (same frame count)
++8  u32 AnimID     strictly increasing within a sprite
++12 f32 Unknown12
++16 u32 Unknown16  0 or 1
++20 u32 SoundID    0 or a sound: the DictID of a 0xB010 AdpcmHeader
++24 f32 Unknown24
++28 f32 Unknown28
++32 u32 Sound2ID   0 or a second sound (0xB010 DictID); set in 28 records
++36 f32 Unknown36
++40 u32 Unknown40
+```
+
+Together the records of a sprite use every 0x2600 in its 0x2610. The only other
+0x2910 version, v0 in DEBUG, has 16-byte records and is not decoded.
+
+**0x2915 v1** slot table: `u32 count`, then `(i32 slot, i32 nodeIndex)` pairs,
+the 0x2920 layout. Every nodeIndex is a 0x2400 joint index, and every 0x2920
+pair appears in 0x2915 unchanged; 0x2915 goes past slot 2. What slots 3 and up
+are for is unknown.
+
+**0x2950** (v7): no body; its children are 0xC000 ParticleDefinitions (see
+[Particle emitters](#particle-emitters)). Empty in most sprites; 30 Frontiers
+CHAR sprites hold 49 definitions between them.
+
+**0x2960** (v7): `u32 count`, then 32-byte records. `+0 ParticleID` is the
+0xC010 id of a definition in the same sprite's 0x2950, and the set of ids used
+equals the set defined. `+12` is below the joint count in every record (a joint
+index, not proven). The rest: `+4`, `+8`, `+20` always 0, `+16` 0 or 1, `+24`
+one of two values per sprite, `+28` always 500.
+
+**0x2A40** two-mesh switch, found in 0x2800 in place of a single 0x2320 (60
+Frontiers sprites, 40 vanilla):
+
+```
+0x2A40
+├── 0x2A50  u32 id (what 0x2900 MeshID names), 6 × f32 (Unknown4)
+├── 0x2A60  two 0x2320 SkinSubSprites
+└── 0x2A70  u32 count, count × (u32 sub-sprite id, f32 Unknown4)
+```
+
+0x2A70 entry i names the i-th 0x2320 in 0x2A60 (its 0x2321 dword 0). The first
+mesh always has more vertices than the second, and its float is 10.0 (15.0 in 8
+vanilla sprites) against 100.0 for the second: consistent with a switch
+distance, not proven. The 0x2A50 floats follow a box min/max pattern, also not
+proven.
 
 ## Meshes — PrimBuffer (0x1200) / SkinPrimBuffer (0x1210)
 
