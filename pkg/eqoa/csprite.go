@@ -33,6 +33,43 @@ func CSpriteChildTypes(version int16) []uint16 {
 	return append([]uint16(nil), cspriteChildTypes[version]...)
 }
 
+// CSpriteHeader is the 0x2710 v4 record (48 bytes on both discs), the first
+// child of every CSprite.
+type CSpriteHeader struct {
+	// ID is the CSprite's id (the 0x2700 has no body of its own).
+	ID uint32
+	// Unknown4 is six floats; each of the first three is below the one three
+	// places later, the pattern of a box min and max. It is several times wider
+	// than the mesh, so not its tight bounds. Not proven.
+	Unknown4  [6]float32
+	Unknown28 uint32 // 0..3
+	// SizeFactor is a uniform size factor. Sprites that share one skeleton and
+	// the same converted geometry differ in all six Unknown4 floats by exactly
+	// their SizeFactor ratio: leopards 0x125E78F0..F3 (0.6, 0.8, 1.0, 1.2) and
+	// alligators 0x3E0EBFE1 (0.8) and 0x88806543 (0.5).
+	SizeFactor float32
+	Unknown36  uint32 // small integers (mostly 9)
+	Unknown40  uint32
+	Unknown44  uint32
+}
+
+// ParseCSpriteHeader decodes a 0x2710 v4 body. It needs at least the 36 bytes
+// up to SizeFactor; Unknown36..44 stay 0 when the body is shorter than 48.
+func ParseCSpriteHeader(body []byte, order binary.ByteOrder) (CSpriteHeader, error) {
+	if len(body) < 36 {
+		return CSpriteHeader{}, fmt.Errorf("CSpriteHeader: body too short (%d bytes)", len(body))
+	}
+	u := func(k int) uint32 { return order.Uint32(body[k : k+4]) }
+	h := CSpriteHeader{ID: u(0), Unknown28: u(28), SizeFactor: math.Float32frombits(u(32))}
+	for i := range h.Unknown4 {
+		h.Unknown4[i] = math.Float32frombits(u(4 + 4*i))
+	}
+	if len(body) >= 48 {
+		h.Unknown36, h.Unknown40, h.Unknown44 = u(36), u(40), u(44)
+	}
+	return h, nil
+}
+
 // CSpriteMeshRef is the 0x2900 record (v0, 12 bytes, one per CSprite).
 type CSpriteMeshRef struct {
 	Unknown0 uint32 // 1 in every sample (as is the 0x2800 child count)
@@ -313,6 +350,7 @@ func recordCount(what string, body []byte, size int, order binary.ByteOrder) (in
 
 // CSpriteRecords gathers the records above for one CSprite.
 type CSpriteRecords struct {
+	Header     *CSpriteHeader       // 0x2710
 	MeshRef    *CSpriteMeshRef      // 0x2900
 	Animations []CSpriteAnimation   // 0x2910
 	SlotTable  []CSpriteAttachSlot  // 0x2915
@@ -333,6 +371,14 @@ func ReadCSpriteRecords(r io.ReadSeeker, obj *ESFObject, order binary.ByteOrder)
 		t := uint16(c.Header.ObjectType)
 		var err error
 		switch t {
+		case 0x2710:
+			var b []byte
+			if b, err = c.ReadBody(r); err == nil {
+				var h CSpriteHeader
+				if h, err = ParseCSpriteHeader(b, order); err == nil {
+					rec.Header = &h
+				}
+			}
 		case 0x2800:
 			for _, gc := range c.Children {
 				if uint16(gc.Header.ObjectType) == 0x2A40 {
