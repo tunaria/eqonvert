@@ -38,6 +38,19 @@ func IsSprite(objType uint16) bool {
 	return false
 }
 
+// IsSkinnedSprite reports whether objType is a CSprite (0x2700) or HSprite
+// (0x2200): a model whose GLB also draws the sub-sprite meshes beneath it.
+func IsSkinnedSprite(objType uint16) bool {
+	return objType == 0x2700 || objType == 0x2200
+}
+
+// IsSubSprite reports whether objType is a sub-sprite mesh (0x2310 or 0x2320).
+// Under a CSprite or HSprite such a mesh is a part of that model, not a model of
+// its own.
+func IsSubSprite(objType uint16) bool {
+	return objType == 0x2310 || objType == 0x2320
+}
+
 func isSpriteHeader(objType uint16) bool {
 	switch objType {
 	case 0x2001, 0x2710, 0x2210, 0x2311, 0x2321, 0x2C10, 0x2A11:
