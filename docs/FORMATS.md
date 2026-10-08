@@ -345,10 +345,10 @@ not geometry. On disc:
 0xC100 ParticleSprite
   0xC101 header            u32 definition dictID
   0xC000 ParticleDefinition (NumberOfSubObjects is a format flag, not a count)
-    0xC010                 u32 texture dictID
+    0xC010                 u32 definition id (its own id, not the texture)
     0x1000 Surface         the particle sprite image
     0xC020                 flat parameter block:
-                           u32 textureDictID, i32 blendMode, i32 zWrite,
+                           u32 textureDictID (see below), i32 blendMode, i32 zWrite,
                            i32 zTest, i32 textureConfig, i32 motifCount-1,
                            then per motif (name[32] for motif>0):
                              13× f32 friction, birthrate(+var), lifespan(+var),
@@ -360,6 +360,12 @@ not geometry. On disc:
                              6× vec3 inner/outer offset+hpr, nozzle axis+hpr
                              i32 gravityOn (ObjectVersion ≥ 1 only)
 ```
+
+The texture is 0xC020 word 0, not 0xC010. 0xC010 never equals it: it is the
+definition's own id, the one a CSprite's 0x2960 refers to. When the 0xC000
+holds a 0x1000 Surface, word 0 is that Surface's dictID in every definition on
+both discs (1425 Frontiers, 1169 vanilla). Definitions with no Surface of their
+own (the 332 in SPELLFX) name a Surface stored elsewhere on the disc.
 
 Emitters nested in a `GroupSprite` (0x2C00) — e.g. a wall-torch flame — are
 positioned by the group's 0x2C30 member array: per member
