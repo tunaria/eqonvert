@@ -28,6 +28,13 @@ type Asset struct {
 	AttachSlots []CSpriteAttachSlot
 	// AttachSlotsErr is set when a 0x2920 object exists but failed to parse.
 	AttachSlotsErr error
+	// AnimTable is the CSprite's 0x2910 v3 animation table (see
+	// ParseCSpriteAnimations), or nil when the sprite has none: not a CSprite,
+	// the undecoded v0 table in DEBUG, or a table that failed to parse
+	// (AnimTableErr). The glTF export names and pairs its clips from it.
+	AnimTable []CSpriteAnimation
+	// AnimTableErr is set when a v3 0x2910 exists but failed to parse.
+	AnimTableErr error
 }
 
 func IsSprite(objType uint16) bool {
@@ -157,6 +164,23 @@ func LoadAsset(r io.ReadSeeker, obj *ESFObject, order binary.ByteOrder) (*Asset,
 			} else {
 				asset.AttachSlots = sl
 			}
+		}
+	}
+
+	// The 0x2910 animation table is a direct child of the CSprite.
+	if asset.ObjectType == 0x2700 {
+		for _, c := range obj.Children {
+			if uint16(c.Header.ObjectType) != 0x2910 || c.Header.ObjectVersion != 3 {
+				continue
+			}
+			body, err := c.ReadBody(r)
+			if err == nil {
+				asset.AnimTable, err = ParseCSpriteAnimations(body, c.Header.ObjectVersion, order)
+			}
+			if err != nil {
+				asset.AnimTable, asset.AnimTableErr = nil, err
+			}
+			break
 		}
 	}
 
