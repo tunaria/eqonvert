@@ -237,8 +237,10 @@ Group g is armor set `[1,2,3,4,8,5,7,6][g]`; sheet p of a group is slot
 `[0,4,1,3,2][p]` (0 chest, 1 bracer, 2 gloves, 3 legs, 4 boots). Read this way,
 every armor, hair and robe id matches the mapping above on both discs, and the
 armor ids are the same on both discs. The helm sprite ids are the same on both
-discs; 7 of 8 helm texture ids differ on vanilla. Which helm goes with which
-armor set is not in the file and stays unknown.
+discs; 7 of 8 helm texture ids differ on vanilla. The helm-to-set pairing is not
+stored in the file ($Helm is filled at run time). DERIVED, not sourced: helm h goes
+with set `[1,2,3,4,8,5,7,6][h]`, the armor-group file order (`CharcustHelm.Set`;
+eqoa-knowledge formats/CONVERTER_FORMATS.md, charcust_layout.json `helms[].set`).
 
 ## Related
 

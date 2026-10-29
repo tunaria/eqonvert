@@ -17,9 +17,10 @@ package eqoa
 //
 // Set and slot of each armor sheet: group g is armor set CharcustGroupSets[g],
 // sheet p of a group is slot CharcustPosSlots[p] (docs/ARMOR_TEXTURE_MAPPING.md,
-// applied to file order). Chest and legs are the 128x128 sheets. Which helm
-// belongs to which armor set is not in the file; ReadCharcustHelms gives the
-// helms in file order only.
+// applied to file order). Chest and legs are the 128x128 sheets. The helm-to-set
+// pairing is not stored in the file (the client's $Helm table is filled at run
+// time). DERIVED, not sourced: helm h goes with set CharcustGroupSets[h], the
+// same file order as the armor groups (eqoa-knowledge formats/CONVERTER_FORMATS.md).
 
 import (
 	"bytes"
@@ -53,6 +54,7 @@ type CharcustSheet struct {
 // CharcustHelm is one root helm sprite. Surface and Mesh are 0 with Has* false when absent.
 type CharcustHelm struct {
 	Index      int
+	Set        int // DERIVED armor set (CharcustGroupSets[Index]), not read from the file
 	ID         uint32
 	Offset     int64
 	Surface    uint32
@@ -139,6 +141,9 @@ func ReadCharcustHelms(data []byte) ([]CharcustHelm, error) {
 			return nil, fmt.Errorf("CHARCUST sprite at 0x%X: 0x2001 header too short", o.Offset)
 		}
 		h := CharcustHelm{Index: len(out), ID: f.order.Uint32(hb[:4]), Offset: o.Offset}
+		if h.Index < len(CharcustGroupSets) {
+			h.Set = CharcustGroupSets[h.Index]
+		}
 		for _, c := range o.Children {
 			switch c.Header.ObjectType {
 			case 0x1110:
