@@ -109,6 +109,10 @@ type matExtras struct {
 	SlotGuess *int `json:"eqoaSlotGuess,omitempty"` // provisional body slot 0..4
 	HairSlot  bool `json:"eqoaHairSlot,omitempty"`
 	Bare      bool `json:"eqoaBareSkin,omitempty"` // received the skin tint
+
+	// Hair is set under --mark-hair on every material whose layer-0 texture is a hair
+	// sheet or the blank hair placeholder; a client hides these under a worn helm.
+	Hair bool `json:"eqoaHair,omitempty"`
 }
 
 // extraLayer records a layer beyond the first -- the ones glTF has nowhere to put. Their

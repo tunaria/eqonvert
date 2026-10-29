@@ -550,6 +550,8 @@ func ExportAssetToBuilderWithAppearance(b *Builder, r io.ReadSeeker, asset *eqoa
 						// Layer 0's modulate, 0-255: the per-race skin tone. Recorded, not applied.
 						c0 := m.Layers[0].Color
 						ex.LayerColor = [4]float32{c0[0] * 255, c0[1] * 255, c0[2] * 255, c0[3] * 255}
+						// --mark-hair: flag hair materials so a client can hide them under a helm.
+						ex.Hair = hairMarkIDs[m.Layers[0].TexID]
 						for _, l := range m.Layers[1:] {
 							ex.ExtraLayers = append(ex.ExtraLayers, extraLayer{
 								TexID:     fmt.Sprintf("0x%X", l.TexID),
@@ -1210,6 +1212,20 @@ func srgbToLinear(c float32) float32 {
 		return c / 12.92
 	}
 	return float32(math.Pow(float64((c+0.055)/1.055), 2.4))
+}
+
+// hairMarkIDs holds the texture ids that mark a hair material: the 8 CHARCUST hair
+// sheets plus the blank hair placeholder (see cmd/appearance.go hairMaterialIDs).
+// Empty unless --mark-hair is given, so default output is unchanged.
+var hairMarkIDs = map[uint32]bool{}
+
+// SetHairMarkIDs sets the hair texture ids that get extras.eqoaHair = true. nil or
+// empty turns marking off.
+func SetHairMarkIDs(ids map[uint32]bool) {
+	if ids == nil {
+		ids = map[uint32]bool{}
+	}
+	hairMarkIDs = ids
 }
 
 // emitSkinModulate controls whether a material layer's RGBA modulate is written as

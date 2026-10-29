@@ -28,6 +28,10 @@ var (
 	spawnScale float64
 )
 
+// markHair sets extras.eqoaHair on every hair material (off by default, so output
+// is unchanged unless asked). See gltf.SetHairMarkIDs.
+var markHair bool
+
 // collisionExport emits each zone's decoded 0x4200 CollBuffer geometry as a
 // separate "collision" glTF node (tagged extras {"collision":true}). ON by
 // default — collision is core game data (the engine's floor/wall pathing reads
@@ -187,6 +191,15 @@ brew install ffmpeg libopenmpt`,
 		gltf.SetGradientBlendBar(gradientBlendBar)
 		gltf.SetMaskCutoff(maskCutoff)
 		gltf.SetCharMaskCutoff(charMaskCutoff)
+		if markHair {
+			t, terr := loadAppearanceTables()
+			if terr != nil {
+				return terr
+			}
+			gltf.SetHairMarkIDs(hairMaterialIDs(t))
+		} else {
+			gltf.SetHairMarkIDs(nil)
+		}
 		path := args[0]
 		info, err := os.Stat(path)
 		if err != nil {
@@ -909,6 +922,7 @@ func init() {
 	convertCmd.Flags().Float64Var(&charMaskCutoff, "char-alpha-cutoff", 0.5, "glTF alphaCutoff for CHARACTER/ITEM MASK materials (0.5; the console's 0.999 discards most of a face's alpha-masked detail overlay)")
 	convertCmd.Flags().BoolVar(&collisionExport, "collision", true, "export zone collision geometry (0x4200 CollBuffer) as a tagged 'collision' node (on by default; --collision=false to omit)")
 	convertCmd.Flags().BoolVar(&markSpawns, "mark-spawns", false, "place a built-in marker at unresolved spawn actors in assembled zones")
+	convertCmd.Flags().BoolVar(&markHair, "mark-hair", false, "set extras.eqoaHair on hair materials so a client can hide hair under a helm")
 	convertCmd.Flags().Float64Var(&spawnScale, "spawn-scale", 1.0, "size multiplier for spawn markers (world units; markers are small vs a zone)")
 	// Appearance baking is EXPERIMENTAL and hidden from help.
 	//

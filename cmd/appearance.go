@@ -91,6 +91,26 @@ func parseDictID(s string) (uint32, error) {
 	return uint32(v), nil
 }
 
+// blankHairSurface is the hair placeholder texture: 16x16, every pixel alpha 0. Models
+// with no hair of their own point their hair material at it. Its name is unknown, so it
+// stays an id.
+const blankHairSurface uint32 = 0x431B69AA
+
+// hairMaterialIDs returns the texture ids that mark a hair material: the 8 hair sheets
+// of the tables plus blankHairSurface. Across the 568 Frontiers CHAR.ESF models the hair
+// RefMap ids point only at these.
+func hairMaterialIDs(t *appearanceTables) map[uint32]bool {
+	ids := map[uint32]bool{blankHairSurface: true}
+	for i := 0; i < 8; i++ {
+		if e, ok := t.Hair[strconv.Itoa(i)]; ok {
+			if id, err := parseDictID(e.DictID); err == nil {
+				ids[id] = true
+			}
+		}
+	}
+	return ids
+}
+
 // raceKey returns the tables' race key matching the user's --apply-appearance
 // argument, case-insensitively (e.g. "erudite" → "Erudite"). Empty if unknown.
 func (t *appearanceTables) raceKey(name string) string {
