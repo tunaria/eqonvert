@@ -363,6 +363,39 @@ per-sprite instead of per-vertex causes seams between terrain sub-blocks.
 Surfaces referenced by no material (AO/detail maps) are skipped during export
 to avoid phantom near-black textures in the GLB.
 
+### Special-surface semantics (zone material `extras`)
+
+Each material layer is 68 bytes and ends with a 2-float **UV scroll rate**
+(`MaterialLayer.Scroll`), the engine's marker for an animated surface. EQOA has
+no intrinsic water/ice flag — the `Surface` record is a pure texture bitmap and
+a water material differs from terrain only by format version — so zone materials
+are annotated (geometry untouched) via glTF `extras` so a runtime can pick a
+shader and behaviour:
+
+| extras key | meaning | source signal |
+|------------|---------|---------------|
+| `eqoaAnimated` + `eqoaScroll:[u,v]` | scrolling surface (water, lava, sky, spell glow) | non-zero layer UV scroll |
+| `eqoaWater` | passable, swimmable, transparent water | layer `TexID` in the curated water set |
+| `eqoaLava`  | emissive, hot lava | curated lava set |
+| `eqoaSky`   | scrolling sky/cloud backdrop | curated sky set |
+| `eqoaMagic` | ambient spell/effect glow (often on buildings) | curated magic set |
+| `eqoaIce`   | solid, occluding, walk-on ice (non-animated) | curated ice set |
+
+The role sets (`animatedSurfaceKind` + `iceSurfaceDictIDs` in
+`pkg/gltf/zone_assembler.go`) are global surface DictIDs confirmed by isolating
+the surface in the zone geometry and inspecting the texture (appearance alone is
+unreliable — the blue "ocean" textures turned out to be the sea *floor* seen
+through the transparent water, not the water surface). Water/lava/sky/magic all
+scroll, so they also carry `eqoaAnimated`. A scrolling surface DictID can be
+reused in different roles by placement, so only surfaces that are the same role
+everywhere are listed; placement-dependent reuse stays `eqoaAnimated`-only for
+the runtime to disambiguate from geometry + collision.
+
+Normals are never altered — a flat pool and a vertical waterfall keep their own
+orientation, and the runtime owns the water shader, swim/underwater camera
+effect, and the (future) dedicated lava/ice shaders. Collision (swim-through vs
+walk-on) comes from the separate collision mesh, not these tags.
+
 **Fullscreen UI backdrops are split across textures.** The GS has no
 1024-wide texture format and only 4MB of VRAM, so hi-res screens (title,
 status) are stored as consecutive 512×512 slices — the border art and title
