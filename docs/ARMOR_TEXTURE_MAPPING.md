@@ -241,6 +241,9 @@ discs; 7 of 8 helm texture ids differ on vanilla. The helm-to-set pairing is not
 stored in the file ($Helm is filled at run time). DERIVED, not sourced: helm h goes
 with set `[1,2,3,4,8,5,7,6][h]`, the armor-group file order (`CharcustHelm.Set`;
 eqoa-knowledge formats/CONVERTER_FORMATS.md, charcust_layout.json `helms[].set`).
+Server data that stores helm looks (for example a ReturnHome dump) holds them as
+armor-set numbers 0..8 per item, the same numbers as the body slots, never helm
+sprite ids, so it cannot test this pairing.
 
 ## Related
 
