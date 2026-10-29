@@ -69,12 +69,15 @@ func buildTTF(f *eqoa.Font) []byte {
 		tg := ttfGlyph{code: code, advance: g.Width * ttfPxUnit}
 
 		// Merge horizontal runs of on-pixels row by row, then extend runs
-		// downward across identical consecutive rows.
+		// downward across identical consecutive rows. Rects are held by
+		// pointer (a pointer into a growing slice goes stale, which dropped
+		// merges) and each row is walked left to right, so the output is
+		// reproducible and every lit pixel is covered.
 		type run struct{ x0, x1, y0, y1 int } // pixel coords, y down
-		var rects []run
+		var rects []*run
 		active := map[[2]int]*run{}
 		for y := 0; y < f.Height; y++ {
-			rowRuns := map[[2]int]bool{}
+			next := map[[2]int]*run{}
 			x := 0
 			for x < g.Width {
 				if g.Pixels.NRGBAAt(x, y).A > thr {
@@ -82,20 +85,17 @@ func buildTTF(f *eqoa.Font) []byte {
 					for x < g.Width && g.Pixels.NRGBAAt(x, y).A > thr {
 						x++
 					}
-					rowRuns[[2]int{x0, x}] = true
+					k := [2]int{x0, x}
+					if prev, ok := active[k]; ok && prev.y1 == y {
+						prev.y1 = y + 1
+						next[k] = prev
+					} else {
+						r := &run{x0, x, y, y + 1}
+						rects = append(rects, r)
+						next[k] = r
+					}
 				} else {
 					x++
-				}
-			}
-			next := map[[2]int]*run{}
-			for k := range rowRuns {
-				if prev, ok := active[k]; ok && prev.y1 == y {
-					prev.y1 = y + 1
-					next[k] = prev
-				} else {
-					r := &run{k[0], k[1], y, y + 1}
-					rects = append(rects, *r)
-					next[k] = &rects[len(rects)-1]
 				}
 			}
 			active = next
