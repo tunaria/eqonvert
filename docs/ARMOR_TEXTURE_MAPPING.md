@@ -227,6 +227,19 @@ see **`MATERIAL_BLEND_MODES.md`**. Briefly: mode 4 is a multiply pass that never
 RGB, mode 0 is an alpha test at `AREF=128`, and blend/wrap/dropped-layer data is now preserved per
 material in glTF `extras`.
 
+## CHARCUST file order (2026-10-29, pkg/eqoa/charcust.go)
+
+`ReadCharcustSheets` and `ReadCharcustHelms` read the sheets and helms straight
+from CHARCUST (Frontiers `/DATA2/CHARCUST.CSF`, vanilla `/DATA/CHARCUST.ESF`).
+Root objects: 57 surfaces (0..39 armor in 8 groups of 5, sides 128/64/64/128/64;
+40..47 hair; 48 blank hair 0x431B69AA 16x16; 49..56 robes), then 8 helm sprites.
+Group g is armor set `[1,2,3,4,8,5,7,6][g]`; sheet p of a group is slot
+`[0,4,1,3,2][p]` (0 chest, 1 bracer, 2 gloves, 3 legs, 4 boots). Read this way,
+every armor, hair and robe id matches the mapping above on both discs, and the
+armor ids are the same on both discs. The helm sprite ids are the same on both
+discs; 7 of 8 helm texture ids differ on vanilla. Which helm goes with which
+armor set is not in the file and stays unknown.
+
 ## Related
 
 **Runtime in-memory layout: `CLIENT_MEMORY_STRUCTURES.md`** (2026-09-10) — the live VICSprite appearance-region
