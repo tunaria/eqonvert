@@ -940,11 +940,12 @@ func init() {
 	// map, these stay hidden so nothing depends on output that is placed wrongly. The
 	// flags still work when named explicitly, and the default export is untouched.
 	convertCmd.Flags().StringVar(&applyAppearanceRace, "apply-appearance", "", "EXPERIMENTAL, body-slot mapping is known wrong: bake a race's CHARCUST appearance onto CHAR* models")
+	convertCmd.Flags().BoolVar(&appearanceMod5Slots, "armor-slots-mod5", false, "old slot rule for --apply-appearance: body slot = material index mod 5 (default: from the skeleton)")
 	convertCmd.Flags().IntVar(&appearanceArmorSet, "armor-set", 1, "CHARCUST armor set 0..8 (0 = bare) used by --apply-appearance")
 	convertCmd.Flags().IntVar(&appearanceHair, "hair", 0, "hair texture index 0..7 used by --apply-appearance")
 	convertCmd.Flags().IntVar(&appearanceTint, "tint", 3, "skin-tint palette index 0..14 used by --apply-appearance (3 = brown)")
 	convertCmd.Flags().StringVar(&appearanceAssetRoot, "appearance-assets", appearanceAssetRoot, "root of the extracted textures that --apply-appearance loads from")
-	for _, f := range []string{"apply-appearance", "armor-set", "hair", "tint", "appearance-assets"} {
+	for _, f := range []string{"apply-appearance", "armor-set", "hair", "tint", "appearance-assets", "armor-slots-mod5"} {
 		_ = convertCmd.Flags().MarkHidden(f)
 	}
 	rootCmd.AddCommand(convertCmd)

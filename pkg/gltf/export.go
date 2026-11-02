@@ -510,8 +510,12 @@ func ExportAssetToBuilderWithAppearance(b *Builder, r io.ReadSeeker, asset *eqoa
 		// Only runs when a spec is supplied (default export path is untouched).
 		var armorTexIdx [5]int
 		hairTexIdx := -1
+		var bodySlots map[int]int
 		for i := range armorTexIdx {
 			armorTexIdx[i] = -1
+		}
+		if appearance != nil && !appearance.Mod5Slots {
+			bodySlots = BodySlotByMaterial(asset.Meshes, asset.Hierarchy)
 		}
 		if appearance != nil {
 			for slot := 0; slot < 5; slot++ {
@@ -658,6 +662,13 @@ func ExportAssetToBuilderWithAppearance(b *Builder, r io.ReadSeeker, asset *eqoa
 					// is best-effort and meant to be visually spot-checked.
 					if appearance != nil {
 						slot := i % 5
+						if bodySlots != nil {
+							if s, ok := bodySlots[i]; ok {
+								slot = s
+							} else {
+								slot = -1
+							}
+						}
 						hairSlot := i == 0 && hairTexIdx >= 0
 						bare := false
 						if hairSlot {
@@ -665,7 +676,7 @@ func ExportAssetToBuilderWithAppearance(b *Builder, r io.ReadSeeker, asset *eqoa
 							gm.AlphaMode = "MASK"
 							cutoff := cutoffFor(blendGradients)
 							gm.AlphaCutoff = &cutoff
-						} else if appearance.ArmorSet != 0 && armorTexIdx[slot] >= 0 {
+						} else if appearance.ArmorSet != 0 && slot >= 0 && armorTexIdx[slot] >= 0 {
 							gm.PBRMetallicRoughness.BaseColorTexture = &TextureInfo{Index: armorTexIdx[slot]}
 						} else {
 							// Bare-skin slot: tint the base color (skin/robe color).
@@ -679,7 +690,9 @@ func ExportAssetToBuilderWithAppearance(b *Builder, r io.ReadSeeker, asset *eqoa
 						}
 						mi, sg := i, slot
 						ex.MatIndex = &mi
-						ex.SlotGuess = &sg
+						if slot >= 0 {
+							ex.SlotGuess = &sg
+						}
 						ex.HairSlot = hairSlot
 						ex.Bare = bare
 					}

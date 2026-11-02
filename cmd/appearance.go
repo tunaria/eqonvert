@@ -54,6 +54,7 @@ var (
 	appearanceArmorSet  int
 	appearanceHair      int
 	appearanceTint      int
+	appearanceMod5Slots bool // --armor-slots-mod5: old index mod 5 slot rule
 )
 
 // dictEntry is one {dictID, file} record in the appearance tables.
@@ -197,6 +198,8 @@ func resolveAppearanceSpec(inputPath string) (*gltf.AppearanceSpec, error) {
 		ArmorSet: appearanceArmorSet,
 		HairIdx:  appearanceHair,
 		TintIdx:  appearanceTint,
+		// The body slot comes from the skeleton unless --armor-slots-mod5.
+		Mod5Slots: appearanceMod5Slots,
 	}
 	tc := tables.Tints[appearanceTint]
 	spec.Tint = [4]uint8{uint8(tc[0]), uint8(tc[1]), uint8(tc[2]), uint8(tc[3])}

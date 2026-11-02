@@ -16,7 +16,11 @@ import (
 // loops iVar8 = 0..4). SetArmorSet swaps each slot's texture; a tint RGBA multiplies
 // the bare-skin slots; SetHair swaps the head material's texture.
 //
-// EXPERIMENTAL — THE SLOT MAPPING BELOW IS KNOWN TO BE WRONG. Materials are taken in
+// Slot rule: by default the body slot comes from the skeleton (bodyslots.go,
+// BodySlotByMaterial); materials that are no body slot stay bare. Mod5Slots keeps
+// the old rule described next, for comparison only.
+//
+// OLD RULE — KNOWN TO BE WRONG. Materials are taken in
 // palette order and assigned slot = idx mod 5. That cannot be right: material indices
 // are not stable between races (the legs are material 0 on one race and 5 or 6 on
 // others), so no ordinal rule holds, and the body resolves into more regions than five
@@ -44,6 +48,11 @@ type AppearanceSpec struct {
 	// DictIDs recorded for the sidecar / root-extras appearance mapping.
 	ArmorDictIDs [5]uint32
 	HairDictID   uint32
+
+	// Mod5Slots restores the old slot rule (palette index mod 5) for
+	// comparing against upstream. By default the body slot comes from the
+	// skeleton (BodySlotByMaterial, bodyslots.go).
+	Mod5Slots bool
 }
 
 // AppearanceMapping is the JSON structure emitted into the root glTF extras (and
@@ -72,7 +81,10 @@ func (a *AppearanceSpec) Mapping() AppearanceMapping {
 		TintIdx:       a.TintIdx,
 		Tint:          a.Tint,
 		HairDictID:    fmt.Sprintf("0x%X", a.HairDictID),
-		SlotHeuristic: slotHeuristicNote,
+		SlotHeuristic: skinSlotNote,
+	}
+	if a.Mod5Slots {
+		m.SlotHeuristic = slotHeuristicNote
 	}
 	for i := 0; i < 5; i++ {
 		m.ArmorDictIDs[i] = fmt.Sprintf("0x%X", a.ArmorDictIDs[i])
