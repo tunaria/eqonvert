@@ -9,6 +9,7 @@ import (
 	"io"
 	"math"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -36,6 +37,8 @@ var (
 	doorsOut    string
 	doorsRadius float64
 	doorsHeight float64
+	doorsByZone bool
+	doorsWorld  int
 )
 
 // spriteHeaders maps a sprite object type to its header child type; the header
@@ -106,6 +109,15 @@ var doorsCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		if cmd.Flags().Changed("world") {
+			kept := rows[:0]
+			for _, row := range rows {
+				if row.World == doorsWorld {
+					kept = append(kept, row)
+				}
+			}
+			rows = kept
+		}
 		data, err := os.ReadFile(args[0])
 		if err != nil {
 			return err
@@ -131,7 +143,11 @@ var doorsCmd = &cobra.Command{
 		kinds := readSpriteKinds(objects, r, order)
 		actors := readZoneActors(objects, r, order)
 		out := matchTravelActors(rows, actors, kinds, doorsRadius, doorsHeight)
-		js, err := json.MarshalIndent(out, "", "  ")
+		var v any = out
+		if doorsByZone {
+			v = travelTriggersByZone(out)
+		}
+		js, err := json.MarshalIndent(v, "", "  ")
 		if err != nil {
 			return err
 		}
@@ -149,6 +165,8 @@ func init() {
 	doorsCmd.Flags().StringVarP(&doorsOut, "output", "o", "", "output JSON path (default stdout)")
 	doorsCmd.Flags().Float64Var(&doorsRadius, "radius", 3, "max ground-plane distance from spawn to actor")
 	doorsCmd.Flags().Float64Var(&doorsHeight, "height", 6, "max vertical distance when the spawn has a y")
+	doorsCmd.Flags().BoolVar(&doorsByZone, "by-zone", false, "group the matched travel triggers by zone (0x3000 index)")
+	doorsCmd.Flags().IntVar(&doorsWorld, "world", 0, "keep only the rows of this server world")
 	rootCmd.AddCommand(doorsCmd)
 }
 
@@ -307,4 +325,62 @@ func readTravelRows(path string) ([]travelRow, error) {
 		rows = append(rows, row)
 	}
 	return rows, nil
+}
+
+// zoneTrigger is one travel trigger in the --by-zone output.
+type zoneTrigger struct {
+	SpawnID  string  `json:"spawnId"`
+	Name     string  `json:"name"`
+	World    int     `json:"world"`
+	Actor    int     `json:"actor"`
+	Hex      string  `json:"hex"`
+	X        float32 `json:"x"`
+	Y        float32 `json:"y"`
+	Z        float32 `json:"z"`
+	Distance float64 `json:"distance"`
+}
+
+// zoneTriggers is one zone's travel triggers, in input order.
+type zoneTriggers struct {
+	Zone     int           `json:"zone"`
+	Triggers []zoneTrigger `json:"triggers"`
+}
+
+// unmatchedRow is a travel spawn with no mesh close enough.
+type unmatchedRow struct {
+	SpawnID string `json:"spawnId"`
+	Name    string `json:"name"`
+	World   int    `json:"world"`
+}
+
+// triggersByZone is the --by-zone output.
+type triggersByZone struct {
+	Zones     []zoneTriggers `json:"zones"`
+	Unmatched []unmatchedRow `json:"unmatched"`
+}
+
+// travelTriggersByZone groups the matches by the zone of their mesh, zones in
+// ascending order and triggers in input order; rows without a mesh go to
+// Unmatched.
+func travelTriggersByZone(matches []doorMatch) triggersByZone {
+	out := triggersByZone{Zones: []zoneTriggers{}, Unmatched: []unmatchedRow{}}
+	idx := map[int]int{}
+	for _, m := range matches {
+		if m.Mesh == nil {
+			out.Unmatched = append(out.Unmatched, unmatchedRow{SpawnID: m.SpawnID, Name: m.Name, World: m.World})
+			continue
+		}
+		i, ok := idx[m.Mesh.Zone]
+		if !ok {
+			i = len(out.Zones)
+			idx[m.Mesh.Zone] = i
+			out.Zones = append(out.Zones, zoneTriggers{Zone: m.Mesh.Zone})
+		}
+		out.Zones[i].Triggers = append(out.Zones[i].Triggers, zoneTrigger{
+			SpawnID: m.SpawnID, Name: m.Name, World: m.World, Actor: m.Mesh.Actor, Hex: m.Mesh.Hex,
+			X: m.Mesh.X, Y: m.Mesh.Y, Z: m.Mesh.Z, Distance: m.Mesh.Distance,
+		})
+	}
+	sort.SliceStable(out.Zones, func(a, b int) bool { return out.Zones[a].Zone < out.Zones[b].Zone })
+	return out
 }
