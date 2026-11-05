@@ -3,9 +3,12 @@ name: Release
 # Runs when a version tag is pushed (e.g. v0.0.1). Cross-compiles the binary
 # for every supported OS/arch, packages each, and publishes a GitHub Release
 # with the archives attached so users can download and run without the source.
+# A push to main or a manual run publishes v0.0.<run number>.
 on:
   push:
     tags: ['v*']
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -21,6 +24,12 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+
+      - name: Pick version
+        id: ver
+        run: |
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then t="$GITHUB_REF_NAME"; else t="v0.0.${{ github.run_number }}"; fi
+          echo "tag=$t" >> "$GITHUB_OUTPUT"
 
       - name: Build cross-platform binaries
         run: bash build.sh
@@ -40,6 +49,8 @@ jobs:
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          target_commitish: ${{ github.sha }}
           files: |
             dist/*.tar.gz
             dist/*.zip
