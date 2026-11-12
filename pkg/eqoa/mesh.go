@@ -37,6 +37,10 @@ func ParsePrimBuffer(r io.ReadSeeker, obj *ESFObject, order binary.ByteOrder) (*
 		return nil, err
 	}
 
+	if obj.Header.ObjectVersion == 0 {
+		return parsePrimBufferV0(data, order)
+	}
+
 	if len(data) < 28 {
 		return nil, fmt.Errorf("PrimBuffer data too short for header: %d", len(data))
 	}
@@ -150,21 +154,73 @@ func ParsePrimBuffer(r io.ReadSeeker, obj *ESFObject, order binary.ByteOrder) (*
 			})
 		}
 
-		// Triangle strip -> list with alternating winding. Even (i,i+2,i+1) / odd (i,i+1,i+2) makes the glTF
-		// counter-clockwise front face agree with the stored EQOA vertex normals; the opposite order lit the back
-		// face of double-sided materials and rendered the ground black (Qeynos terrain: 559,538 triangles agree
-		// with the normals this way, 3,724 the other way). Same as the JS port (tunaria-eqoa c0cb9350).
-		if len(fg.Vertices) >= 3 {
-			for i := 0; i < len(fg.Vertices)-2; i++ {
-				if i%2 == 0 {
-					fg.Indices = append(fg.Indices, uint32(i), uint32(i+2), uint32(i+1))
-				} else {
-					fg.Indices = append(fg.Indices, uint32(i), uint32(i+1), uint32(i+2))
-				}
-			}
-		}
+		stripIndices(&fg)
 		m.FaceGroups = append(m.FaceGroups, fg)
 	}
 
+	return m, nil
+}
+
+// stripIndices expands a triangle strip to a list. Even (i,i+2,i+1) / odd (i,i+1,i+2) makes the glTF
+// counter-clockwise front face agree with the stored EQOA vertex normals (Qeynos terrain: 559,538 triangles this
+// way, 3,724 the other) and with the client's VU1 strip cull, whose parity flag flips every vertex. The opposite
+// order lit the back face of double-sided materials and rendered the ground black. Same as the JS port.
+func stripIndices(fg *FaceGroup) {
+	for i := 0; i+2 < len(fg.Vertices); i++ {
+		if i%2 == 0 {
+			fg.Indices = append(fg.Indices, uint32(i), uint32(i+2), uint32(i+1))
+		} else {
+			fg.Indices = append(fg.Indices, uint32(i), uint32(i+1), uint32(i+2))
+		}
+	}
+}
+
+// parsePrimBufferV0 reads the older float record (ObjectVersion 0, the client's ParsePrimBufferObjV0):
+// nmats, numFaceGroups, totalVerts, then per face group numVerts, matIdx and numVerts x
+// { x,y,z,u,v f32; nx,ny,nz f32; r,g,b,a u8 } (36 bytes a vertex). Returned as type 0 with unit packing.
+func parsePrimBufferV0(data []byte, order binary.ByteOrder) (*Mesh, error) {
+	if len(data) < 12 {
+		return nil, fmt.Errorf("PrimBuffer v0 data too short for header: %d", len(data))
+	}
+	br := bytes.NewReader(data)
+	var nmats, numFaceGroups, totalVerts int32
+	binary.Read(br, order, &nmats)
+	binary.Read(br, order, &numFaceGroups)
+	binary.Read(br, order, &totalVerts)
+	if numFaceGroups < 0 || numFaceGroups > 10000 {
+		return nil, fmt.Errorf("invalid numFaceGroups: %d", numFaceGroups)
+	}
+	m := &Mesh{Type: 0, PackingPos: 1, PackingUV: 1, FaceGroups: make([]FaceGroup, 0, numFaceGroups)}
+	clamp1 := func(v float32) float32 {
+		if v > 1.0 {
+			return 1.0
+		}
+		return v
+	}
+	for fi := 0; fi < int(numFaceGroups); fi++ {
+		var numVerts, matIdx int32
+		if err := binary.Read(br, order, &numVerts); err != nil {
+			break
+		}
+		binary.Read(br, order, &matIdx)
+		if numVerts < 0 || numVerts > 10000 || int64(numVerts)*36 > int64(br.Len()) {
+			return nil, fmt.Errorf("invalid numVerts: %d in face group %d", numVerts, fi)
+		}
+		fg := FaceGroup{MaterialIndex: matIdx, Vertices: make([]Vertex, 0, numVerts)}
+		for i := 0; i < int(numVerts); i++ {
+			var f [8]float32
+			var c [4]uint8
+			binary.Read(br, order, &f)
+			binary.Read(br, order, &c)
+			fg.Vertices = append(fg.Vertices, Vertex{
+				Pos:    [3]float32{f[0], f[1], f[2]},
+				UV:     [2]float32{f[3], f[4]},
+				Normal: [3]float32{f[5], f[6], f[7]},
+				Color:  [4]float32{clamp1(float32(c[0]) / 128.0), clamp1(float32(c[1]) / 128.0), clamp1(float32(c[2]) / 128.0), clamp1(float32(c[3]) / 128.0)},
+			})
+		}
+		stripIndices(&fg)
+		m.FaceGroups = append(m.FaceGroups, fg)
+	}
 	return m, nil
 }
