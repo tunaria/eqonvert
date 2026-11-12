@@ -32,19 +32,19 @@ a DictID (from `pkg/eqoa/esf.go`):
 |------|---------|-------------------|
 | `0x1000` | Surface | a texture |
 | `0x1100` | Material | a material |
-| `0x1200` / `0x1210` | PrimBuffer | mesh geometry |
-| `0x2000` | Sprite | a model |
+| `0x1200` / `0x1210` | PrimBuffer / SkinPrimBuffer | mesh geometry |
+| `0x2000` | SimpleSprite | a model |
 | `0x2200` | HSprite | a skeletal/segmented model |
-| `0x2700` | GroupSprite | a multi-member model (creatures, windmills) |
-| `0x2A10` | LODSprite header | an LOD model |
-| `0x2310` / `0x2320` | Sub-sprite | a member mesh |
-| `0x2C00` / `0x2C30` | (sprite variants) | a model |
-| `0xA000` | (container) | — |
+| `0x2700` | CSprite | a character model (skeleton, animations, attach slots) |
+| `0x2A10` | LODSprite | an LOD model |
+| `0x2310` / `0x2320` | SimpleSubSprite / SkinSubSprite | a member mesh |
+| `0x2C00` / `0x2C30` | GroupSprite / GroupSpriteMembers | a multi-member model (props); 0x2C30 places its members |
+| `0xA000` | ResourceDir | — |
 | `0xB000` | Adpcm | a VAG-ADPCM sound |
 | `0xB030` | Xm | a tracker-music module |
-| `0xB100` | (audio container) | — |
+| `0xB100` | SoundSprite | — |
 | `0x6000` | ZoneActor | the model/resource to place in a zone |
-| `0x6020` | (zone actor variant) | — |
+| `0x6020` | StaticLightingObj | — |
 | `0x3240` | ZoneRoom | a room/chunk |
 
 A DictID of `0` means "none" and is ignored.
