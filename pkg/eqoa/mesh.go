@@ -150,12 +150,16 @@ func ParsePrimBuffer(r io.ReadSeeker, obj *ESFObject, order binary.ByteOrder) (*
 			})
 		}
 
+		// Triangle strip -> list with alternating winding. Even (i,i+2,i+1) / odd (i,i+1,i+2) makes the glTF
+		// counter-clockwise front face agree with the stored EQOA vertex normals; the opposite order lit the back
+		// face of double-sided materials and rendered the ground black (Qeynos terrain: 559,538 triangles agree
+		// with the normals this way, 3,724 the other way). Same as the JS port (tunaria-eqoa c0cb9350).
 		if len(fg.Vertices) >= 3 {
 			for i := 0; i < len(fg.Vertices)-2; i++ {
 				if i%2 == 0 {
-					fg.Indices = append(fg.Indices, uint32(i), uint32(i+1), uint32(i+2))
-				} else {
 					fg.Indices = append(fg.Indices, uint32(i), uint32(i+2), uint32(i+1))
+				} else {
+					fg.Indices = append(fg.Indices, uint32(i), uint32(i+1), uint32(i+2))
 				}
 			}
 		}
