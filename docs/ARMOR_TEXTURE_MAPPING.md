@@ -260,3 +260,16 @@ robe 4x2, helm 8).
 
 Memory: `project_armor_texture_swap`, `project_model_naming`, `project_client_game_logic`,
 `project_char_garment_alpha`, `project_char_dup_blank`, `project_eqoa_ui_tools`.
+
+## Body slot from the skeleton (default since the eqoa-armor branch)
+
+`--apply-appearance` no longer takes slot = material index mod 5. Each body
+material takes the region most of its vertices hang on, with regions read from
+the shape of the skeleton (`pkg/gltf/bodyslots.go`, `BodyRegions`):
+chest = spine up to the shoulders, clavicles and upper arms; bracer = forearm;
+gloves = hand and fingers (the first arm joint with 3+ children); legs = pelvis
+and thighs; boots = below the knee; the head subtree is no slot. Joint numbers
+are not used: vanilla player skeletons have 52 joints, Frontiers ones 40 or 43.
+Checked on DATA/CHAR.ESF of both discs: the 24 humanoid models that carry all
+five body parts get all five slots on both. `--armor-slots-mod5` keeps the old
+rule for comparison. Same rule as tunaria-eqoa `tools/eqoa/lib/appearance.js`.
