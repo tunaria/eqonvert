@@ -150,6 +150,7 @@ docs/         Format documentation and the reverse-engineering evidence.
 | Zones (0x3000 family) | ✅ terrain + placements |
 | Sound effects (0xB000 ADPCM) | ✅ FLAC (decoded) + `.vag` (original ADPCM, source-of-truth) |
 | Music (0xB030 XM modules) | ✅ back-converted to playable `.xm` during convert |
+| Character sounds per animation (CSprite 0x2910 sound ids) | ✅ `eqonvert dev sfx`: each animation's sounds (0xB010 header ids) → `SFX/0x<id>.wav` + `SFX/sfx.json` (sprite → animation → sounds) |
 | Loading/error screens (`.16` files) | ✅ 640×448 PSMCT16 → PNG |
 | Item models + icons | ✅ named from the item database (`ITEM_Adorned_Crossbow_0x….glb`, `ITEMICON_…png`); 0x2D00 PointSprites are 8-byte glow-marker refs, not geometry |
 | Streamed music + voice-overs (`.BGM`) | ✅ FLAC (decoded, 44100 Hz) + `.vag` (original ADPCM, preserves loop flags/structure) |
