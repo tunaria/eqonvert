@@ -40,7 +40,8 @@ func TestEulerRotMatrixIdentity(t *testing.T) {
 // East(+X) to North(+Z) and leave Height(+Y) fixed — the common actor case.
 func TestEulerRotMatrixYaw90(t *testing.T) {
 	m := EulerRotMatrix([3]float32{float32(math.Pi / 2), 0, 0})
-	vecEq(t, apply(m, [3]float32{1, 0, 0}), [3]float32{0, 0, 1}, 1e-5) // East -> North
+	vecEq(t, apply(m, [3]float32{1, 0, 0}), [3]float32{0, 0, -1}, 1e-5) // East -> South
+	vecEq(t, apply(m, [3]float32{0, 0, 1}), [3]float32{1, 0, 0}, 1e-5)  // North -> East
 	vecEq(t, apply(m, [3]float32{0, 1, 0}), [3]float32{0, 1, 0}, 1e-5) // Height fixed
 }
 

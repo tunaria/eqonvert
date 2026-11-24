@@ -769,22 +769,22 @@ func (za *ZoneAssembler) AddSpriteAtWorldPos(asset *eqoa.Asset, pos [3]float32, 
 	}
 }
 
-// EulerRotMatrix builds the row-major 3×3 rotation for EQOA actor euler angles
-// rot = [yaw about Height(Y), pitch about East(X), roll about North(Z)],
-// composed R = Ryaw·Rpitch·Rroll — the same convention AddSpriteAtWorldPos bakes.
-// Exported so callers can transform a sprite's collision geometry by the same
-// actor placement the visual mesh receives (see cmd collectSpriteCollision).
+// EulerRotMatrix builds the row-major 3×3 rotation (world = R·v) for EQOA actor euler angles
+// rot = [yaw about Height(Y), pitch, roll], exactly as the client's VIMatrix44::Transform(hpr, scale, t):
+// its rows are the object axes in world space (world = v·M), so R is its transpose. An earlier version had the
+// yaw sine negated, which turned every placed actor the wrong way (a hall at yaw 90° stood 180° round).
+// Exported so callers can transform a sprite's collision geometry by the same placement as the visual mesh.
 func EulerRotMatrix(rot [3]float32) [9]float32 {
-	cy := float32(math.Cos(float64(rot[0])))
-	sy := float32(math.Sin(float64(rot[0])))
-	cp := float32(math.Cos(float64(rot[1])))
-	sp := float32(math.Sin(float64(rot[1])))
-	cr := float32(math.Cos(float64(rot[2])))
-	sr := float32(math.Sin(float64(rot[2])))
+	ci := float32(math.Cos(float64(rot[0])))
+	si := float32(math.Sin(float64(rot[0])))
+	cj := float32(math.Cos(float64(rot[1])))
+	sj := float32(math.Sin(float64(rot[1])))
+	ch := float32(math.Cos(float64(rot[2])))
+	sh := float32(math.Sin(float64(rot[2])))
 	return [9]float32{
-		cy*cr - sy*sp*sr, -cy*sr - sy*sp*cr, -sy * cp,
-		cp * sr, cp * cr, -sp,
-		sy*cr + cy*sp*sr, -sy*sr + cy*sp*cr, cy * cp,
+		ch*ci + sh*sj*si, -sh*ci + ch*sj*si, cj * si,
+		sh * cj, ch * cj, -sj,
+		-ch*si + sh*sj*ci, sh*si + ch*sj*ci, cj * ci,
 	}
 }
 
